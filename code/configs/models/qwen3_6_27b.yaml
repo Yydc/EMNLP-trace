@@ -5,13 +5,14 @@ family: open_dense
 access: local
 backend: vllm
 hf_repo: Qwen/Qwen3.6-27B
+local_path: /data2/yix/model/Qwen3.6-27B
 quantization: bf16
 gpu_memory_utilization: 0.92
 max_model_len: 32768
 vllm_port: 8000
 temperature: 0.2
 top_p: 0.95
-max_output_tokens: 4096
+max_output_tokens: 8192
 seed: 12345
 t_max: 5
 prompt_template: full_transcript

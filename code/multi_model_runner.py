@@ -232,6 +232,35 @@ class MultiModelGenerator:
                 "output_tokens": getattr(meta, "candidates_token_count", 0) or 0,
             }
 
+        # response_mime_type='text/plain' forces text-only output. Without it,
+        # Gemini-3.1-Pro on code-heavy prompts often auto-engages
+        # function-calling mode and returns finish_reason=10 (MALFORMED_FUNCTION_CALL),
+        # making response.text raise. Same for the parts-walking fallback
+        # below: read .parts directly to survive non-text candidates.
+        def _extract_text_safely(resp) -> str:
+            # Try the quick accessor first; fall back to walking parts.
+            try:
+                t = getattr(resp, "text", None)
+                if t:
+                    return t
+            except Exception:
+                pass
+            try:
+                cands = getattr(resp, "candidates", []) or []
+                if cands:
+                    content = getattr(cands[0], "content", None)
+                    if content:
+                        parts = getattr(content, "parts", []) or []
+                        chunks = []
+                        for p in parts:
+                            t = getattr(p, "text", None)
+                            if t:
+                                chunks.append(t)
+                        return "".join(chunks)
+            except Exception:
+                pass
+            return ""
+
         try:
             # Newer SDK (`from google import genai`)
             client = genai.Client(api_key=self.api_key)  # type: ignore[attr-defined]
@@ -241,10 +270,11 @@ class MultiModelGenerator:
                 config={
                     "temperature": temperature,
                     "max_output_tokens": max_tokens,
+                    "response_mime_type": "text/plain",
                 },
             )
             _capture_gemini_usage(response)
-            return getattr(response, "text", None) or ""
+            return _extract_text_safely(response)
         except (AttributeError, TypeError):
             pass
 
@@ -257,10 +287,11 @@ class MultiModelGenerator:
                 generation_config={
                     "temperature": temperature,
                     "max_output_tokens": max_tokens,
+                    "response_mime_type": "text/plain",
                 },
             )
             _capture_gemini_usage(response)
-            return getattr(response, "text", "") or ""
+            return _extract_text_safely(response)
         except Exception as e:
             print(f"Error calling Gemini API: {e}", file=sys.stderr)
             self.last_usage = {"input_tokens": 0, "output_tokens": 0}
@@ -268,16 +299,27 @@ class MultiModelGenerator:
 
 
 def extract_code(text: str) -> str:
-    """从 LLM 响应中提取代码块"""
-    if "```python" in text:
-        parts = text.split("```python")
-        if len(parts) > 1:
-            code_part = parts[1].split("```")[0]
-            return code_part.strip()
-    elif "```" in text:
-        parts = text.split("```")
-        if len(parts) >= 3:
-            return parts[1].strip()
+    """Extract the most plausible code block from an LLM response.
+
+    Strategy:
+      1. Find all ```python ... ``` (or plain ``` ... ```) fenced blocks.
+      2. Prefer the LAST block (model's final answer after any pseudocode/analysis).
+      3. textwrap.dedent the chosen block (GLM/Gemma sometimes write code
+         nested under headings with extra leading whitespace).
+      4. Fall back to text.strip() if no fences found.
+
+    Old behaviour took the FIRST python block — broke for GLM-4.7-Flash,
+    which often writes a pseudocode block first then the real implementation.
+    """
+    import re
+    import textwrap
+    # Match both ```python ... ``` and plain ``` ... ``` blocks
+    blocks = re.findall(r"```(?:python)?\s*\n?(.*?)```", text, re.DOTALL)
+    if blocks:
+        chosen = blocks[-1].rstrip("\n")
+        chosen = textwrap.dedent(chosen).strip()
+        if chosen:
+            return chosen
     return text.strip()
 
 
@@ -650,6 +692,23 @@ def run_debug_session(
     return problem_log
 
 
+# Defensive caps for the multi-turn loop. Without these, accumulated_code +
+# candidate_code can grow unboundedly across attempts (LLM may echo earlier
+# context back into its response, then we feed that back as current_code).
+# Caught in practice: on tracebench_full hard problems Gemma-4-31B generated
+# multi-MB prompts that vLLM rejected with 400 (32K context overflow).
+MAX_PROMPT_CHARS       = int(os.environ.get("MAX_PROMPT_CHARS", "100000"))
+MAX_CODE_CHARS         = int(os.environ.get("MAX_CODE_CHARS", "40000"))
+ACCUMULATED_CODE_CAP   = int(os.environ.get("ACCUMULATED_CODE_CAP", "30000"))
+
+
+def _cap_code(s: str, limit: int = ACCUMULATED_CODE_CAP) -> str:
+    """Truncate code keeping the TAIL (most recent / most relevant)."""
+    if len(s) <= limit:
+        return s
+    return "# [truncated by orchestrator]\n" + s[-(limit - 32):]
+
+
 def run_multi_turn_debug_session(
     entry: Dict[str, Any],
     mode: str = "baseline",
@@ -736,8 +795,12 @@ def run_multi_turn_debug_session(
             task_desc += f"\n\nYou can use the previously implemented code:\n```python\n{context}\n```"
 
         current_code = expected_target
-        context_seed = accumulated_code if accumulated_code else context
-        full_code = context_seed + "\n\n" + current_code if context_seed else current_code
+        # Cap both inputs to keep cross-turn growth bounded. The TAIL of the
+        # previous code is what's relevant for the next turn (most-recent
+        # solved-state); old prefixes are not re-tested.
+        context_seed = (_cap_code(accumulated_code) if accumulated_code
+                        else _cap_code(context or ""))
+        full_code = (context_seed + "\n\n" + current_code) if context_seed else current_code
 
         success, output, trace, anchor_hits = _run_tracebench_tests(
             full_code, f"turn_{turn_id}.py", test_cases, entry
@@ -746,7 +809,7 @@ def run_multi_turn_debug_session(
         if success:
             turn_solved = True
             turn_result["solved"] = True
-            accumulated_code = full_code
+            accumulated_code = _cap_code(full_code)
             dialogue_chain.append({
                 "turn": turn_id, "role": "user",
                 "content": task_desc + "\n\nImplement these functions to pass the tests.",
@@ -775,6 +838,31 @@ def run_multi_turn_debug_session(
                     mode=mode,
                     anchor_hits=sorted(set(seed_anchors + anchor_hits)),
                 )
+
+                # Guard: abort attempt if prompt would overflow model context.
+                # Without this the LLM rejects with 400 and we burn attempts
+                # without progress for pathological problems.
+                if len(prompt) > MAX_PROMPT_CHARS:
+                    attempt_log = {
+                        "attempt_number": total_attempts,
+                        "turn": turn_id, "attempt_in_turn": attempt_idx,
+                        "mode": mode, "provider": provider, "model": generator.model,
+                        "temperature": temperature,
+                        "input_tokens": 0, "output_tokens": 0,
+                        "blame_spans": [],
+                        "success": False,
+                        "test_result": (f"prompt_exceeded_budget: "
+                                        f"{len(prompt)} chars > {MAX_PROMPT_CHARS}"),
+                        "code_before": "",
+                        "edited_lines": [],
+                    }
+                    turn_result["attempts"].append(attempt_log)
+                    last_trace = attempt_log["test_result"]
+                    # Aggressively shrink accumulated_code so the next attempt
+                    # has a chance to fit.
+                    accumulated_code = _cap_code(accumulated_code, limit=10000)
+                    full_code = _cap_code(full_code, limit=10000)
+                    continue
 
                 candidate_code = ""
                 candidate_spans: List[Dict[str, Any]] = []
@@ -828,6 +916,15 @@ def run_multi_turn_debug_session(
                     turn_input_tokens += call_in
                     turn_output_tokens += call_out
                     candidate_code = extract_code(raw_resp or "") if raw_resp else ""
+                    candidate_spans = (
+                        _compute_patch_spans(full_code, candidate_code, f"turn_{turn_id}.py")
+                        if candidate_code else []
+                    )
+
+                # Cap oversized candidate code so the next attempt's prompt
+                # doesn't inherit the bloat. Truncation keeps the tail.
+                if candidate_code and len(candidate_code) > MAX_CODE_CHARS:
+                    candidate_code = _cap_code(candidate_code, limit=MAX_CODE_CHARS)
                     candidate_spans = (
                         _compute_patch_spans(full_code, candidate_code, f"turn_{turn_id}.py")
                         if candidate_code else []
@@ -898,20 +995,20 @@ def run_multi_turn_debug_session(
                 if success:
                     turn_solved = True
                     turn_result["solved"] = True
-                    accumulated_code = candidate_code
+                    accumulated_code = _cap_code(candidate_code)
                     dialogue_chain.append({
                         "turn": turn_id, "role": "user",
                         "content": task_desc + f"\n\nTests failed with:\n{last_trace}\n\nPlease fix the code.",
                     })
                     dialogue_chain.append({
                         "turn": turn_id, "role": "assistant",
-                        "content": f"```python\n{candidate_code}\n```",
+                        "content": f"```python\n{_cap_code(candidate_code)}\n```",
                     })
                     break
 
                 last_trace = trace or output
                 anchor_hits = anchor_hits or []
-                full_code = candidate_code
+                full_code = _cap_code(candidate_code)
 
         if not turn_solved:
             dialogue_chain.append({
@@ -919,7 +1016,7 @@ def run_multi_turn_debug_session(
                 "content": task_desc + f"\n\nTests failed with:\n{last_trace}",
             })
             if full_code:
-                accumulated_code = full_code
+                accumulated_code = _cap_code(full_code)
 
         subproblems_log.append(turn_result)
         turn_summaries.append({

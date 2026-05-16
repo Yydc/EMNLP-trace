@@ -169,7 +169,11 @@ def main() -> None:
             else:
                 guard.add_call_no_cost()
 
-            # Minimal per-problem record
+            # Per-problem record. `subproblems` contains the per-attempt detail
+            # (blame_spans, generated_code, code_before, edited_lines, patch_spans,
+            # per_test_results, raw_response) that TraceabilityMetrics.analyze /
+            # metrics_v2 need to compute Outside-G, RegressionRate, Blame@K, slope.
+            # Without this, downstream analyze can only compute pass1/avg_turns.
             record = {
                 "problem_id": pid,
                 "trace_id": entry.get("trace_id"),
@@ -179,6 +183,7 @@ def main() -> None:
                 "total_turns": problem_log.get("total_turns"),
                 "total_attempts": problem_log.get("total_attempts"),
                 "turn_results": problem_log.get("turn_results"),
+                "subproblems":  problem_log.get("subproblems"),
                 "total_input_tokens": in_tok,
                 "total_output_tokens": out_tok,
             }

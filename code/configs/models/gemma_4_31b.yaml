@@ -1,0 +1,29 @@
+# Gemma-4-31B-IT — Google open-weight dense model (added for local validation)
+id: gemma_4_31b
+display_name: Gemma-4-31B-IT
+family: open_dense
+access: local
+
+# vLLM launch — weights pre-downloaded to local path; served-name mirrors hf_repo
+backend: vllm
+hf_repo: google/gemma-4-31b-it
+local_path: /data2/yix/model/gemma-4-31b-it
+quantization: bf16
+gpu_memory_utilization: 0.92
+max_model_len: 32768
+vllm_port: 8000
+
+# Decoding
+temperature: 0.2
+top_p: 0.95
+max_output_tokens: 8192
+seed: 12345
+
+# Multi-turn protocol
+t_max: 5
+prompt_template: full_transcript
+require_blame_json: true
+
+# Cost accounting (estimate; not in paper's official lineup)
+estimated_h100_hours_full: 2.3
+estimated_api_usd_full: 0

@@ -56,6 +56,11 @@ models:
     access: local
     estimated_h100_hours: 2.5
     estimated_api_usd: 0
+  - id: gemma_4_31b
+    config: code/configs/models/gemma_4_31b.yaml
+    access: local                  # local validation add-on (not in paper's 6-model lineup)
+    estimated_h100_hours: 2.3
+    estimated_api_usd: 0
   - id: gemini_31_pro
     config: code/configs/models/gemini_31_pro.yaml
     access: api

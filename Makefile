@@ -63,23 +63,26 @@ dry-run: ## Stage 1: Day-0 30-task calibration across 6 models
 	$(PY) code/scripts/00_dry_run_calibration.py \
 	    --config $(CFG) --output-dir $(WORK)/dry_run/
 
-eval: ## Stage 2: 6-model × Full main run (resumable)
-	$(PY) code/scripts/02_run_evaluation.py --config $(CFG) --model qwen3_5_27b      --split full
-	$(PY) code/scripts/02_run_evaluation.py --config $(CFG) --model qwen3_6_27b      --split full
-	$(PY) code/scripts/02_run_evaluation.py --config $(CFG) --model qwen3_6_35b_a3b  --split full
-	$(PY) code/scripts/02_run_evaluation.py --config $(CFG) --model glm_47_flash     --split full
-	$(PY) code/scripts/02_run_evaluation.py --config $(CFG) --model deepseek_r1_32b  --split full
-	$(PY) code/scripts/02_run_evaluation.py --config $(CFG) --model gemini_31_pro    --split full
+eval: ## Stage 2: 6-model × Full main run (resumable, vllm orchestrated)
+	scripts/run_cell.py qwen3_5_27b      --max-wall-clock-hours 3
+	scripts/run_cell.py qwen3_6_27b      --max-wall-clock-hours 3
+	scripts/run_cell.py qwen3_6_35b_a3b  --max-wall-clock-hours 3
+	scripts/run_cell.py glm_47_flash     --max-wall-clock-hours 3
+	scripts/run_cell.py deepseek_r1_32b  --max-wall-clock-hours 3
+	scripts/run_cell.py gemini_31_pro    --max-usd 131 --max-wall-clock-hours 6
 
-eval-local: ## Stage 2 (local subset only — no API)
-	$(PY) code/scripts/02_run_evaluation.py --config $(CFG) --model qwen3_5_27b      --split full
-	$(PY) code/scripts/02_run_evaluation.py --config $(CFG) --model qwen3_6_27b      --split full
-	$(PY) code/scripts/02_run_evaluation.py --config $(CFG) --model qwen3_6_35b_a3b  --split full
-	$(PY) code/scripts/02_run_evaluation.py --config $(CFG) --model glm_47_flash     --split full
-	$(PY) code/scripts/02_run_evaluation.py --config $(CFG) --model deepseek_r1_32b  --split full
+eval-local: ## Stage 2 (5 local cells, vllm orchestrated per cell)
+	scripts/run_cell.py qwen3_5_27b      --max-wall-clock-hours 3
+	scripts/run_cell.py qwen3_6_27b      --max-wall-clock-hours 3
+	scripts/run_cell.py qwen3_6_35b_a3b  --max-wall-clock-hours 3
+	scripts/run_cell.py glm_47_flash     --max-wall-clock-hours 3
+	scripts/run_cell.py deepseek_r1_32b  --max-wall-clock-hours 3
 
-eval-api: ## Stage 2 (API only — Gemini)
-	$(PY) code/scripts/02_run_evaluation.py --config $(CFG) --model gemini_31_pro    --split full
+eval-api: ## Stage 2 (Gemini cell only; needs GOOGLE_API_KEY in env)
+	scripts/run_cell.py gemini_31_pro    --max-usd 131 --max-wall-clock-hours 6
+
+eval-extra-gemma: ## Add-on: Gemma cell (not in paper's 6-model lineup)
+	scripts/run_cell.py gemma_4_31b      --max-wall-clock-hours 3
 
 analyze: ## Stage 3: produce 8 CSV tables + numbers.json from records
 	$(PY) code/scripts/03_analyze.py --config $(CFG) \
@@ -100,10 +103,11 @@ check: tex figures ## Stage 6: hard-fail consistency guardrail
 	$(PY) code/scripts/06_consistency_check.py --config $(CFG) --strict
 
 paper: check ## Stage 7: compile main.pdf
-	cd code/paper && pdflatex -interaction=nonstopmode main.tex
-	cd code/paper && bibtex main || true
-	cd code/paper && pdflatex -interaction=nonstopmode main.tex
-	cd code/paper && pdflatex -interaction=nonstopmode main.tex
+	@PATH="$$HOME/.TinyTeX/bin/x86_64-linux:$$PATH"; \
+	  cd code/paper && pdflatex -interaction=nonstopmode main.tex && \
+	  (bibtex main || true) && \
+	  pdflatex -interaction=nonstopmode main.tex && \
+	  pdflatex -interaction=nonstopmode main.tex
 	@echo ""
 	@echo "==>  code/paper/main.pdf"
 

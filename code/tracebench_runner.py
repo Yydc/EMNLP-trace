@@ -161,6 +161,12 @@ def _build_multi_turn_prompt(
 
     prompt = f"""You are solving a multi-turn programming task. This is Turn {turn_id}.
 
+IMPORTANT OUTPUT RULES:
+- Return ONLY the corrected Python code in a single ```python``` fenced block.
+- Do NOT include analysis, planning, step-by-step reasoning, or commentary before or after the code.
+- If you must explain, keep it under 50 words AFTER the code block.
+- The code block must be the COMPLETE corrected file/function, not a diff or snippet.
+
 {history_text}
 
 ## Current Task:

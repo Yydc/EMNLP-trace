@@ -10,7 +10,7 @@ api_model_id: gemini-3.1-pro-preview
 # Decoding
 temperature: 0.2
 top_p: 0.95
-max_output_tokens: 4096
+max_output_tokens: 8192
 seed: 12345                       # passed to Gemini API where supported
 
 # Multi-turn protocol — same as local
