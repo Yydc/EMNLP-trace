@@ -1,0 +1,2548 @@
+[
+  {
+    "trace_id": "TB_HARD_00000",
+    "problem_id": "1054H",
+    "source": "original",
+    "rating": 3500,
+    "difficulty": "extreme",
+    "depth": 3,
+    "num_turns": 2,
+    "num_injections": 1,
+    "total_test_cases": 6,
+    "codeforces_tags": [
+      "chinese remainder theorem",
+      "fft",
+      "math",
+      "number theory"
+    ],
+    "error_turns": [
+      1
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00001",
+    "problem_id": "1292F",
+    "source": "original",
+    "rating": 3500,
+    "difficulty": "extreme",
+    "depth": 3,
+    "num_turns": 3,
+    "num_injections": 1,
+    "total_test_cases": 14,
+    "codeforces_tags": [
+      "bitmasks",
+      "combinatorics",
+      "dp"
+    ],
+    "error_turns": [
+      2
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00002",
+    "problem_id": "1967E2",
+    "source": "original",
+    "rating": 3500,
+    "difficulty": "extreme",
+    "depth": 3,
+    "num_turns": 2,
+    "num_injections": 1,
+    "total_test_cases": 9,
+    "codeforces_tags": [
+      "combinatorics",
+      "dp",
+      "math"
+    ],
+    "error_turns": [
+      1
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00003",
+    "problem_id": "2057H",
+    "source": "original",
+    "rating": 3500,
+    "difficulty": "extreme",
+    "depth": 3,
+    "num_turns": 2,
+    "num_injections": 1,
+    "total_test_cases": 6,
+    "codeforces_tags": [
+      "data structures",
+      "greedy",
+      "math"
+    ],
+    "error_turns": [
+      1
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00004",
+    "problem_id": "1190F",
+    "source": "original",
+    "rating": 3400,
+    "difficulty": "extreme",
+    "depth": 6,
+    "num_turns": 6,
+    "num_injections": 3,
+    "total_test_cases": 21,
+    "codeforces_tags": [
+      "number theory",
+      "probabilities"
+    ],
+    "error_turns": [
+      1,
+      2,
+      4
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00005",
+    "problem_id": "1770G",
+    "source": "original",
+    "rating": 3400,
+    "difficulty": "extreme",
+    "depth": 6,
+    "num_turns": 5,
+    "num_injections": 3,
+    "total_test_cases": 18,
+    "codeforces_tags": [
+      "divide and conquer",
+      "fft",
+      "math"
+    ],
+    "error_turns": [
+      2,
+      3,
+      4
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00006",
+    "problem_id": "2018E2",
+    "source": "original",
+    "rating": 3400,
+    "difficulty": "extreme",
+    "depth": 3,
+    "num_turns": 2,
+    "num_injections": 1,
+    "total_test_cases": 9,
+    "codeforces_tags": [
+      "binary search",
+      "data structures",
+      "divide and conquer",
+      "dsu",
+      "greedy",
+      "math",
+      "sortings"
+    ],
+    "error_turns": [
+      1
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00009",
+    "problem_id": "1322E",
+    "source": "original",
+    "rating": 3300,
+    "difficulty": "extreme",
+    "depth": 3,
+    "num_turns": 3,
+    "num_injections": 2,
+    "total_test_cases": 9,
+    "codeforces_tags": [
+      "data structures"
+    ],
+    "error_turns": [
+      1,
+      2
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00007",
+    "problem_id": "1466H",
+    "source": "original",
+    "rating": 3300,
+    "difficulty": "extreme",
+    "depth": 4,
+    "num_turns": 4,
+    "num_injections": 2,
+    "total_test_cases": 27,
+    "codeforces_tags": [
+      "combinatorics",
+      "dp",
+      "graphs",
+      "greedy",
+      "math"
+    ],
+    "error_turns": [
+      1,
+      3
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00010",
+    "problem_id": "1804H",
+    "source": "original",
+    "rating": 3300,
+    "difficulty": "extreme",
+    "depth": 3,
+    "num_turns": 3,
+    "num_injections": 1,
+    "total_test_cases": 9,
+    "codeforces_tags": [
+      "bitmasks",
+      "dp"
+    ],
+    "error_turns": [
+      2
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00008",
+    "problem_id": "865E",
+    "source": "original",
+    "rating": 3300,
+    "difficulty": "extreme",
+    "depth": 4,
+    "num_turns": 4,
+    "num_injections": 1,
+    "total_test_cases": 15,
+    "codeforces_tags": [
+      "bitmasks",
+      "brute force",
+      "dp",
+      "graphs"
+    ],
+    "error_turns": [
+      3
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00011",
+    "problem_id": "986F",
+    "source": "original",
+    "rating": 3300,
+    "difficulty": "extreme",
+    "depth": 3,
+    "num_turns": 2,
+    "num_injections": 1,
+    "total_test_cases": 9,
+    "codeforces_tags": [
+      "graphs",
+      "math",
+      "number theory",
+      "shortest paths"
+    ],
+    "error_turns": [
+      1
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00014",
+    "problem_id": "1081G",
+    "source": "original",
+    "rating": 3200,
+    "difficulty": "extreme",
+    "depth": 3,
+    "num_turns": 3,
+    "num_injections": 1,
+    "total_test_cases": 15,
+    "codeforces_tags": [
+      "math",
+      "probabilities"
+    ],
+    "error_turns": [
+      1
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00015",
+    "problem_id": "1638F",
+    "source": "expanded",
+    "rating": 3200,
+    "difficulty": "extreme",
+    "depth": 3,
+    "num_turns": 3,
+    "num_injections": 1,
+    "total_test_cases": 12,
+    "codeforces_tags": [
+      "brute force",
+      "data structures",
+      "greedy",
+      "two pointers"
+    ],
+    "error_turns": [
+      0
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00016",
+    "problem_id": "1864H",
+    "source": "original",
+    "rating": 3200,
+    "difficulty": "extreme",
+    "depth": 3,
+    "num_turns": 3,
+    "num_injections": 1,
+    "total_test_cases": 7,
+    "codeforces_tags": [
+      "dp",
+      "math",
+      "matrices"
+    ],
+    "error_turns": [
+      2
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00012",
+    "problem_id": "571E",
+    "source": "expanded",
+    "rating": 3200,
+    "difficulty": "extreme",
+    "depth": 5,
+    "num_turns": 5,
+    "num_injections": 1,
+    "total_test_cases": 9,
+    "codeforces_tags": [
+      "math"
+    ],
+    "error_turns": [
+      3
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00017",
+    "problem_id": "585F",
+    "source": "expanded",
+    "rating": 3200,
+    "difficulty": "extreme",
+    "depth": 3,
+    "num_turns": 3,
+    "num_injections": 1,
+    "total_test_cases": 9,
+    "codeforces_tags": [
+      "dp",
+      "implementation",
+      "strings"
+    ],
+    "error_turns": [
+      0
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00013",
+    "problem_id": "744D",
+    "source": "original",
+    "rating": 3200,
+    "difficulty": "extreme",
+    "depth": 4,
+    "num_turns": 4,
+    "num_injections": 3,
+    "total_test_cases": 21,
+    "codeforces_tags": [
+      "geometry"
+    ],
+    "error_turns": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00018",
+    "problem_id": "924F",
+    "source": "original",
+    "rating": 3200,
+    "difficulty": "extreme",
+    "depth": 3,
+    "num_turns": 2,
+    "num_injections": 1,
+    "total_test_cases": 6,
+    "codeforces_tags": [
+      "dp"
+    ],
+    "error_turns": [
+      1
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00022",
+    "problem_id": "1205E",
+    "source": "original",
+    "rating": 3100,
+    "difficulty": "extreme",
+    "depth": 3,
+    "num_turns": 2,
+    "num_injections": 1,
+    "total_test_cases": 6,
+    "codeforces_tags": [
+      "combinatorics",
+      "strings"
+    ],
+    "error_turns": [
+      1
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00020",
+    "problem_id": "1805F2",
+    "source": "original",
+    "rating": 3100,
+    "difficulty": "extreme",
+    "depth": 4,
+    "num_turns": 3,
+    "num_injections": 1,
+    "total_test_cases": 9,
+    "codeforces_tags": [
+      "greedy",
+      "math",
+      "sortings",
+      "two pointers"
+    ],
+    "error_turns": [
+      1
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00023",
+    "problem_id": "1924E",
+    "source": "original",
+    "rating": 3100,
+    "difficulty": "extreme",
+    "depth": 3,
+    "num_turns": 2,
+    "num_injections": 1,
+    "total_test_cases": 9,
+    "codeforces_tags": [
+      "combinatorics",
+      "probabilities"
+    ],
+    "error_turns": [
+      1
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00021",
+    "problem_id": "1954F",
+    "source": "original",
+    "rating": 3100,
+    "difficulty": "extreme",
+    "depth": 4,
+    "num_turns": 4,
+    "num_injections": 1,
+    "total_test_cases": 24,
+    "codeforces_tags": [
+      "combinatorics",
+      "dp",
+      "math"
+    ],
+    "error_turns": [
+      1
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00019",
+    "problem_id": "662E",
+    "source": "original",
+    "rating": 3100,
+    "difficulty": "extreme",
+    "depth": 5,
+    "num_turns": 4,
+    "num_injections": 3,
+    "total_test_cases": 15,
+    "codeforces_tags": [
+      "brute force",
+      "dp",
+      "greedy"
+    ],
+    "error_turns": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00024",
+    "problem_id": "986D",
+    "source": "original",
+    "rating": 3100,
+    "difficulty": "extreme",
+    "depth": 3,
+    "num_turns": 3,
+    "num_injections": 1,
+    "total_test_cases": 21,
+    "codeforces_tags": [
+      "fft",
+      "math"
+    ],
+    "error_turns": [
+      1
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00026",
+    "problem_id": "1201E2",
+    "source": "expanded",
+    "rating": 3000,
+    "difficulty": "extreme",
+    "depth": 4,
+    "num_turns": 4,
+    "num_injections": 1,
+    "total_test_cases": 10,
+    "codeforces_tags": [
+      "graphs",
+      "interactive",
+      "shortest paths"
+    ],
+    "error_turns": [
+      3
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00025",
+    "problem_id": "1392H",
+    "source": "original",
+    "rating": 3000,
+    "difficulty": "extreme",
+    "depth": 5,
+    "num_turns": 5,
+    "num_injections": 1,
+    "total_test_cases": 21,
+    "codeforces_tags": [
+      "combinatorics",
+      "dp",
+      "math",
+      "probabilities"
+    ],
+    "error_turns": [
+      3
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00030",
+    "problem_id": "1418F",
+    "source": "original",
+    "rating": 3000,
+    "difficulty": "extreme",
+    "depth": 3,
+    "num_turns": 3,
+    "num_injections": 1,
+    "total_test_cases": 12,
+    "codeforces_tags": [
+      "data structures",
+      "math",
+      "number theory",
+      "two pointers"
+    ],
+    "error_turns": [
+      1
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00027",
+    "problem_id": "1572E",
+    "source": "original",
+    "rating": 3000,
+    "difficulty": "extreme",
+    "depth": 4,
+    "num_turns": 3,
+    "num_injections": 1,
+    "total_test_cases": 9,
+    "codeforces_tags": [
+      "binary search",
+      "dp",
+      "geometry"
+    ],
+    "error_turns": [
+      2
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00031",
+    "problem_id": "1659F",
+    "source": "original",
+    "rating": 3000,
+    "difficulty": "extreme",
+    "depth": 3,
+    "num_turns": 2,
+    "num_injections": 1,
+    "total_test_cases": 6,
+    "codeforces_tags": [
+      "dfs and similar",
+      "games",
+      "graphs",
+      "trees"
+    ],
+    "error_turns": [
+      1
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00028",
+    "problem_id": "1743G",
+    "source": "original",
+    "rating": 3000,
+    "difficulty": "extreme",
+    "depth": 4,
+    "num_turns": 4,
+    "num_injections": 1,
+    "total_test_cases": 24,
+    "codeforces_tags": [
+      "bitmasks",
+      "combinatorics",
+      "constructive algorithms",
+      "data structures",
+      "dp",
+      "hashing",
+      "math"
+    ],
+    "error_turns": [
+      1
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00032",
+    "problem_id": "2056F2",
+    "source": "original",
+    "rating": 3000,
+    "difficulty": "extreme",
+    "depth": 3,
+    "num_turns": 3,
+    "num_injections": 1,
+    "total_test_cases": 7,
+    "codeforces_tags": [
+      "bitmasks",
+      "brute force",
+      "combinatorics",
+      "dp",
+      "math"
+    ],
+    "error_turns": [
+      2
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00029",
+    "problem_id": "356E",
+    "source": "original",
+    "rating": 3000,
+    "difficulty": "extreme",
+    "depth": 4,
+    "num_turns": 4,
+    "num_injections": 1,
+    "total_test_cases": 12,
+    "codeforces_tags": [
+      "dp",
+      "hashing",
+      "implementation",
+      "string suffix structures",
+      "strings"
+    ],
+    "error_turns": [
+      2
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00033",
+    "problem_id": "914F",
+    "source": "original",
+    "rating": 3000,
+    "difficulty": "extreme",
+    "depth": 3,
+    "num_turns": 3,
+    "num_injections": 1,
+    "total_test_cases": 11,
+    "codeforces_tags": [
+      "bitmasks",
+      "brute force",
+      "data structures",
+      "string suffix structures",
+      "strings"
+    ],
+    "error_turns": [
+      1
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00034",
+    "problem_id": "1146H",
+    "source": "original",
+    "rating": 2900,
+    "difficulty": "extreme",
+    "depth": 5,
+    "num_turns": 5,
+    "num_injections": 3,
+    "total_test_cases": 15,
+    "codeforces_tags": [
+      "dp",
+      "geometry"
+    ],
+    "error_turns": [
+      2,
+      3,
+      4
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00037",
+    "problem_id": "1221G",
+    "source": "original",
+    "rating": 2900,
+    "difficulty": "extreme",
+    "depth": 3,
+    "num_turns": 3,
+    "num_injections": 2,
+    "total_test_cases": 18,
+    "codeforces_tags": [
+      "bitmasks",
+      "brute force",
+      "combinatorics",
+      "dp",
+      "meet-in-the-middle"
+    ],
+    "error_turns": [
+      1,
+      2
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00038",
+    "problem_id": "1605F",
+    "source": "original",
+    "rating": 2900,
+    "difficulty": "extreme",
+    "depth": 3,
+    "num_turns": 3,
+    "num_injections": 1,
+    "total_test_cases": 15,
+    "codeforces_tags": [
+      "combinatorics",
+      "dp"
+    ],
+    "error_turns": [
+      1
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00039",
+    "problem_id": "1630E",
+    "source": "original",
+    "rating": 2900,
+    "difficulty": "extreme",
+    "depth": 3,
+    "num_turns": 3,
+    "num_injections": 1,
+    "total_test_cases": 7,
+    "codeforces_tags": [
+      "combinatorics",
+      "math",
+      "number theory",
+      "probabilities"
+    ],
+    "error_turns": [
+      2
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00035",
+    "problem_id": "1949E",
+    "source": "original",
+    "rating": 2900,
+    "difficulty": "extreme",
+    "depth": 4,
+    "num_turns": 4,
+    "num_injections": 3,
+    "total_test_cases": 12,
+    "codeforces_tags": [
+      "brute force",
+      "math"
+    ],
+    "error_turns": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00036",
+    "problem_id": "338D",
+    "source": "original",
+    "rating": 2900,
+    "difficulty": "extreme",
+    "depth": 4,
+    "num_turns": 3,
+    "num_injections": 1,
+    "total_test_cases": 9,
+    "codeforces_tags": [
+      "chinese remainder theorem",
+      "math",
+      "number theory"
+    ],
+    "error_turns": [
+      2
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00046",
+    "problem_id": "1279F",
+    "source": "original",
+    "rating": 2800,
+    "difficulty": "extreme",
+    "depth": 3,
+    "num_turns": 3,
+    "num_injections": 1,
+    "total_test_cases": 9,
+    "codeforces_tags": [
+      "binary search",
+      "dp"
+    ],
+    "error_turns": [
+      2
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00041",
+    "problem_id": "1491G",
+    "source": "expanded",
+    "rating": 2800,
+    "difficulty": "extreme",
+    "depth": 4,
+    "num_turns": 3,
+    "num_injections": 1,
+    "total_test_cases": 5,
+    "codeforces_tags": [
+      "constructive algorithms",
+      "graphs",
+      "math"
+    ],
+    "error_turns": [
+      2
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00047",
+    "problem_id": "1654F",
+    "source": "original",
+    "rating": 2800,
+    "difficulty": "extreme",
+    "depth": 3,
+    "num_turns": 3,
+    "num_injections": 1,
+    "total_test_cases": 9,
+    "codeforces_tags": [
+      "bitmasks",
+      "data structures",
+      "divide and conquer",
+      "greedy",
+      "hashing",
+      "sortings",
+      "strings"
+    ],
+    "error_turns": [
+      1
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00042",
+    "problem_id": "1732E",
+    "source": "original",
+    "rating": 2800,
+    "difficulty": "extreme",
+    "depth": 4,
+    "num_turns": 3,
+    "num_injections": 1,
+    "total_test_cases": 9,
+    "codeforces_tags": [
+      "data structures",
+      "dp",
+      "math",
+      "number theory"
+    ],
+    "error_turns": [
+      2
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00040",
+    "problem_id": "1809G",
+    "source": "original",
+    "rating": 2800,
+    "difficulty": "extreme",
+    "depth": 5,
+    "num_turns": 5,
+    "num_injections": 1,
+    "total_test_cases": 18,
+    "codeforces_tags": [
+      "combinatorics",
+      "dp",
+      "math"
+    ],
+    "error_turns": [
+      1
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00043",
+    "problem_id": "1900F",
+    "source": "original",
+    "rating": 2800,
+    "difficulty": "extreme",
+    "depth": 4,
+    "num_turns": 3,
+    "num_injections": 1,
+    "total_test_cases": 12,
+    "codeforces_tags": [
+      "binary search",
+      "data structures",
+      "implementation"
+    ],
+    "error_turns": [
+      1
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00048",
+    "problem_id": "1923F",
+    "source": "original",
+    "rating": 2800,
+    "difficulty": "extreme",
+    "depth": 3,
+    "num_turns": 3,
+    "num_injections": 1,
+    "total_test_cases": 12,
+    "codeforces_tags": [
+      "binary search",
+      "brute force",
+      "greedy",
+      "hashing",
+      "implementation",
+      "string suffix structures",
+      "strings"
+    ],
+    "error_turns": [
+      1
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00049",
+    "problem_id": "319D",
+    "source": "expanded",
+    "rating": 2800,
+    "difficulty": "extreme",
+    "depth": 3,
+    "num_turns": 3,
+    "num_injections": 1,
+    "total_test_cases": 9,
+    "codeforces_tags": [
+      "greedy",
+      "hashing",
+      "string suffix structures",
+      "strings"
+    ],
+    "error_turns": [
+      0
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00044",
+    "problem_id": "722F",
+    "source": "original",
+    "rating": 2800,
+    "difficulty": "extreme",
+    "depth": 4,
+    "num_turns": 4,
+    "num_injections": 2,
+    "total_test_cases": 15,
+    "codeforces_tags": [
+      "chinese remainder theorem",
+      "data structures",
+      "implementation",
+      "number theory",
+      "two pointers"
+    ],
+    "error_turns": [
+      1,
+      3
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00045",
+    "problem_id": "913F",
+    "source": "original",
+    "rating": 2800,
+    "difficulty": "extreme",
+    "depth": 4,
+    "num_turns": 4,
+    "num_injections": 1,
+    "total_test_cases": 18,
+    "codeforces_tags": [
+      "dp",
+      "graphs",
+      "math",
+      "probabilities"
+    ],
+    "error_turns": [
+      2
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00053",
+    "problem_id": "109E",
+    "source": "expanded",
+    "rating": 2700,
+    "difficulty": "extreme",
+    "depth": 3,
+    "num_turns": 3,
+    "num_injections": 2,
+    "total_test_cases": 7,
+    "codeforces_tags": [
+      "brute force",
+      "math"
+    ],
+    "error_turns": [
+      1,
+      2
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00054",
+    "problem_id": "113E",
+    "source": "expanded",
+    "rating": 2700,
+    "difficulty": "extreme",
+    "depth": 3,
+    "num_turns": 2,
+    "num_injections": 1,
+    "total_test_cases": 6,
+    "codeforces_tags": [
+      "combinatorics",
+      "implementation",
+      "math"
+    ],
+    "error_turns": [
+      1
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00055",
+    "problem_id": "1369F",
+    "source": "original",
+    "rating": 2700,
+    "difficulty": "extreme",
+    "depth": 3,
+    "num_turns": 3,
+    "num_injections": 1,
+    "total_test_cases": 9,
+    "codeforces_tags": [
+      "dfs and similar",
+      "dp",
+      "games"
+    ],
+    "error_turns": [
+      0
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00056",
+    "problem_id": "1422F",
+    "source": "expanded",
+    "rating": 2700,
+    "difficulty": "extreme",
+    "depth": 3,
+    "num_turns": 3,
+    "num_injections": 1,
+    "total_test_cases": 6,
+    "codeforces_tags": [
+      "data structures",
+      "math",
+      "number theory"
+    ],
+    "error_turns": [
+      0
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00057",
+    "problem_id": "1468L",
+    "source": "original",
+    "rating": 2700,
+    "difficulty": "extreme",
+    "depth": 3,
+    "num_turns": 3,
+    "num_injections": 2,
+    "total_test_cases": 9,
+    "codeforces_tags": [
+      "binary search",
+      "greedy",
+      "math",
+      "number theory"
+    ],
+    "error_turns": [
+      1,
+      2
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00058",
+    "problem_id": "1789F",
+    "source": "original",
+    "rating": 2700,
+    "difficulty": "extreme",
+    "depth": 3,
+    "num_turns": 3,
+    "num_injections": 1,
+    "total_test_cases": 15,
+    "codeforces_tags": [
+      "bitmasks",
+      "brute force",
+      "dp",
+      "greedy",
+      "implementation",
+      "strings"
+    ],
+    "error_turns": [
+      2
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00059",
+    "problem_id": "1799F",
+    "source": "original",
+    "rating": 2700,
+    "difficulty": "extreme",
+    "depth": 3,
+    "num_turns": 2,
+    "num_injections": 1,
+    "total_test_cases": 9,
+    "codeforces_tags": [
+      "binary search",
+      "brute force",
+      "dp",
+      "greedy",
+      "sortings"
+    ],
+    "error_turns": [
+      1
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00060",
+    "problem_id": "1924D",
+    "source": "original",
+    "rating": 2700,
+    "difficulty": "extreme",
+    "depth": 3,
+    "num_turns": 3,
+    "num_injections": 1,
+    "total_test_cases": 7,
+    "codeforces_tags": [
+      "combinatorics",
+      "dp",
+      "math"
+    ],
+    "error_turns": [
+      2
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00061",
+    "problem_id": "2040F",
+    "source": "original",
+    "rating": 2700,
+    "difficulty": "extreme",
+    "depth": 3,
+    "num_turns": 2,
+    "num_injections": 1,
+    "total_test_cases": 9,
+    "codeforces_tags": [
+      "combinatorics",
+      "dp",
+      "math",
+      "number theory"
+    ],
+    "error_turns": [
+      1
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00062",
+    "problem_id": "256D",
+    "source": "expanded",
+    "rating": 2700,
+    "difficulty": "extreme",
+    "depth": 3,
+    "num_turns": 3,
+    "num_injections": 1,
+    "total_test_cases": 6,
+    "codeforces_tags": [
+      "dp"
+    ],
+    "error_turns": [
+      0
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00063",
+    "problem_id": "339E",
+    "source": "expanded",
+    "rating": 2700,
+    "difficulty": "extreme",
+    "depth": 3,
+    "num_turns": 3,
+    "num_injections": 2,
+    "total_test_cases": 7,
+    "codeforces_tags": [
+      "constructive algorithms",
+      "dfs and similar",
+      "greedy"
+    ],
+    "error_turns": [
+      1,
+      2
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00064",
+    "problem_id": "524F",
+    "source": "expanded",
+    "rating": 2700,
+    "difficulty": "extreme",
+    "depth": 3,
+    "num_turns": 3,
+    "num_injections": 1,
+    "total_test_cases": 9,
+    "codeforces_tags": [
+      "data structures",
+      "greedy",
+      "hashing",
+      "string suffix structures",
+      "strings"
+    ],
+    "error_turns": [
+      0
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00050",
+    "problem_id": "715C",
+    "source": "original",
+    "rating": 2700,
+    "difficulty": "extreme",
+    "depth": 5,
+    "num_turns": 4,
+    "num_injections": 3,
+    "total_test_cases": 21,
+    "codeforces_tags": [
+      "dfs and similar",
+      "divide and conquer",
+      "dsu",
+      "trees"
+    ],
+    "error_turns": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00065",
+    "problem_id": "827E",
+    "source": "expanded",
+    "rating": 2700,
+    "difficulty": "extreme",
+    "depth": 3,
+    "num_turns": 3,
+    "num_injections": 2,
+    "total_test_cases": 7,
+    "codeforces_tags": [
+      "fft",
+      "math",
+      "strings"
+    ],
+    "error_turns": [
+      1,
+      2
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00066",
+    "problem_id": "906D",
+    "source": "expanded",
+    "rating": 2700,
+    "difficulty": "extreme",
+    "depth": 3,
+    "num_turns": 3,
+    "num_injections": 1,
+    "total_test_cases": 7,
+    "codeforces_tags": [
+      "chinese remainder theorem",
+      "math",
+      "number theory"
+    ],
+    "error_turns": [
+      2
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00052",
+    "problem_id": "961F",
+    "source": "original",
+    "rating": 2700,
+    "difficulty": "extreme",
+    "depth": 4,
+    "num_turns": 4,
+    "num_injections": 2,
+    "total_test_cases": 12,
+    "codeforces_tags": [
+      "binary search",
+      "hashing",
+      "string suffix structures"
+    ],
+    "error_turns": [
+      2,
+      3
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00051",
+    "problem_id": "995E",
+    "source": "expanded",
+    "rating": 2700,
+    "difficulty": "extreme",
+    "depth": 5,
+    "num_turns": 4,
+    "num_injections": 1,
+    "total_test_cases": 10,
+    "codeforces_tags": [
+      "divide and conquer",
+      "graphs",
+      "meet-in-the-middle",
+      "number theory"
+    ],
+    "error_turns": [
+      1
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00067",
+    "problem_id": "1257G",
+    "source": "original",
+    "rating": 2600,
+    "difficulty": "very_hard",
+    "depth": 6,
+    "num_turns": 4,
+    "num_injections": 1,
+    "total_test_cases": 15,
+    "codeforces_tags": [
+      "divide and conquer",
+      "fft",
+      "greedy",
+      "math",
+      "number theory"
+    ],
+    "error_turns": [
+      1
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00073",
+    "problem_id": "1270F",
+    "source": "original",
+    "rating": 2600,
+    "difficulty": "very_hard",
+    "depth": 3,
+    "num_turns": 3,
+    "num_injections": 1,
+    "total_test_cases": 9,
+    "codeforces_tags": [
+      "math",
+      "strings"
+    ],
+    "error_turns": [
+      2
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00074",
+    "problem_id": "1325E",
+    "source": "original",
+    "rating": 2600,
+    "difficulty": "very_hard",
+    "depth": 3,
+    "num_turns": 3,
+    "num_injections": 1,
+    "total_test_cases": 9,
+    "codeforces_tags": [
+      "brute force",
+      "dfs and similar",
+      "graphs",
+      "number theory",
+      "shortest paths"
+    ],
+    "error_turns": [
+      1
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00075",
+    "problem_id": "1380G",
+    "source": "original",
+    "rating": 2600,
+    "difficulty": "very_hard",
+    "depth": 3,
+    "num_turns": 3,
+    "num_injections": 1,
+    "total_test_cases": 10,
+    "codeforces_tags": [
+      "greedy",
+      "math",
+      "probabilities"
+    ],
+    "error_turns": [
+      1
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00076",
+    "problem_id": "1394C",
+    "source": "original",
+    "rating": 2600,
+    "difficulty": "very_hard",
+    "depth": 3,
+    "num_turns": 3,
+    "num_injections": 2,
+    "total_test_cases": 9,
+    "codeforces_tags": [
+      "binary search",
+      "geometry",
+      "ternary search"
+    ],
+    "error_turns": [
+      1,
+      2
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00077",
+    "problem_id": "1437F",
+    "source": "original",
+    "rating": 2600,
+    "difficulty": "very_hard",
+    "depth": 3,
+    "num_turns": 3,
+    "num_injections": 1,
+    "total_test_cases": 12,
+    "codeforces_tags": [
+      "combinatorics",
+      "dp",
+      "math",
+      "two pointers"
+    ],
+    "error_turns": [
+      0
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00078",
+    "problem_id": "1469F",
+    "source": "original",
+    "rating": 2600,
+    "difficulty": "very_hard",
+    "depth": 3,
+    "num_turns": 2,
+    "num_injections": 1,
+    "total_test_cases": 9,
+    "codeforces_tags": [
+      "binary search",
+      "data structures",
+      "greedy"
+    ],
+    "error_turns": [
+      1
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00079",
+    "problem_id": "152D",
+    "source": "expanded",
+    "rating": 2600,
+    "difficulty": "very_hard",
+    "depth": 3,
+    "num_turns": 3,
+    "num_injections": 1,
+    "total_test_cases": 7,
+    "codeforces_tags": [
+      "brute force"
+    ],
+    "error_turns": [
+      0
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00068",
+    "problem_id": "1569E",
+    "source": "original",
+    "rating": 2600,
+    "difficulty": "very_hard",
+    "depth": 4,
+    "num_turns": 4,
+    "num_injections": 1,
+    "total_test_cases": 18,
+    "codeforces_tags": [
+      "bitmasks",
+      "brute force",
+      "hashing",
+      "implementation",
+      "meet-in-the-middle"
+    ],
+    "error_turns": [
+      1
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00080",
+    "problem_id": "1815D",
+    "source": "expanded",
+    "rating": 2600,
+    "difficulty": "very_hard",
+    "depth": 3,
+    "num_turns": 2,
+    "num_injections": 1,
+    "total_test_cases": 6,
+    "codeforces_tags": [
+      "bitmasks",
+      "combinatorics",
+      "dp",
+      "math"
+    ],
+    "error_turns": [
+      2
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00081",
+    "problem_id": "1821F",
+    "source": "original",
+    "rating": 2600,
+    "difficulty": "very_hard",
+    "depth": 3,
+    "num_turns": 3,
+    "num_injections": 2,
+    "total_test_cases": 12,
+    "codeforces_tags": [
+      "combinatorics",
+      "dp",
+      "fft",
+      "math"
+    ],
+    "error_turns": [
+      1,
+      2
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00082",
+    "problem_id": "1919E",
+    "source": "original",
+    "rating": 2600,
+    "difficulty": "very_hard",
+    "depth": 3,
+    "num_turns": 3,
+    "num_injections": 2,
+    "total_test_cases": 7,
+    "codeforces_tags": [
+      "combinatorics",
+      "constructive algorithms",
+      "dp",
+      "implementation",
+      "math"
+    ],
+    "error_turns": [
+      1,
+      2
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00069",
+    "problem_id": "274C",
+    "source": "original",
+    "rating": 2600,
+    "difficulty": "very_hard",
+    "depth": 4,
+    "num_turns": 4,
+    "num_injections": 1,
+    "total_test_cases": 12,
+    "codeforces_tags": [
+      "brute force",
+      "geometry"
+    ],
+    "error_turns": [
+      1
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00083",
+    "problem_id": "360D",
+    "source": "expanded",
+    "rating": 2600,
+    "difficulty": "very_hard",
+    "depth": 3,
+    "num_turns": 3,
+    "num_injections": 2,
+    "total_test_cases": 9,
+    "codeforces_tags": [
+      "number theory"
+    ],
+    "error_turns": [
+      1,
+      2
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00070",
+    "problem_id": "542D",
+    "source": "expanded",
+    "rating": 2600,
+    "difficulty": "very_hard",
+    "depth": 4,
+    "num_turns": 4,
+    "num_injections": 1,
+    "total_test_cases": 11,
+    "codeforces_tags": [
+      "dfs and similar",
+      "dp",
+      "hashing",
+      "math",
+      "number theory"
+    ],
+    "error_turns": [
+      3
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00071",
+    "problem_id": "622F",
+    "source": "original",
+    "rating": 2600,
+    "difficulty": "very_hard",
+    "depth": 4,
+    "num_turns": 4,
+    "num_injections": 3,
+    "total_test_cases": 12,
+    "codeforces_tags": [
+      "math"
+    ],
+    "error_turns": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00072",
+    "problem_id": "982E",
+    "source": "original",
+    "rating": 2600,
+    "difficulty": "very_hard",
+    "depth": 4,
+    "num_turns": 2,
+    "num_injections": 1,
+    "total_test_cases": 6,
+    "codeforces_tags": [
+      "geometry",
+      "number theory"
+    ],
+    "error_turns": [
+      1
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00085",
+    "problem_id": "1073F",
+    "source": "original",
+    "rating": 2500,
+    "difficulty": "very_hard",
+    "depth": 4,
+    "num_turns": 4,
+    "num_injections": 2,
+    "total_test_cases": 15,
+    "codeforces_tags": [
+      "dfs and similar",
+      "dp",
+      "greedy",
+      "trees"
+    ],
+    "error_turns": [
+      2,
+      3
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00084",
+    "problem_id": "1187F",
+    "source": "original",
+    "rating": 2500,
+    "difficulty": "very_hard",
+    "depth": 5,
+    "num_turns": 5,
+    "num_injections": 3,
+    "total_test_cases": 17,
+    "codeforces_tags": [
+      "dp",
+      "math",
+      "probabilities"
+    ],
+    "error_turns": [
+      1,
+      2,
+      4
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00086",
+    "problem_id": "1312F",
+    "source": "original",
+    "rating": 2500,
+    "difficulty": "very_hard",
+    "depth": 4,
+    "num_turns": 3,
+    "num_injections": 2,
+    "total_test_cases": 15,
+    "codeforces_tags": [
+      "games",
+      "two pointers"
+    ],
+    "error_turns": [
+      1,
+      2
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00087",
+    "problem_id": "712E",
+    "source": "expanded",
+    "rating": 2500,
+    "difficulty": "very_hard",
+    "depth": 4,
+    "num_turns": 4,
+    "num_injections": 2,
+    "total_test_cases": 16,
+    "codeforces_tags": [
+      "data structures",
+      "math",
+      "probabilities"
+    ],
+    "error_turns": [
+      2,
+      3
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00088",
+    "problem_id": "997C",
+    "source": "original",
+    "rating": 2500,
+    "difficulty": "very_hard",
+    "depth": 4,
+    "num_turns": 3,
+    "num_injections": 2,
+    "total_test_cases": 9,
+    "codeforces_tags": [
+      "combinatorics",
+      "math"
+    ],
+    "error_turns": [
+      1,
+      2
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00089",
+    "problem_id": "1080E",
+    "source": "original",
+    "rating": 2400,
+    "difficulty": "very_hard",
+    "depth": 4,
+    "num_turns": 3,
+    "num_injections": 1,
+    "total_test_cases": 9,
+    "codeforces_tags": [
+      "strings"
+    ],
+    "error_turns": [
+      2
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00090",
+    "problem_id": "1096G",
+    "source": "original",
+    "rating": 2400,
+    "difficulty": "very_hard",
+    "depth": 4,
+    "num_turns": 3,
+    "num_injections": 1,
+    "total_test_cases": 9,
+    "codeforces_tags": [
+      "divide and conquer",
+      "dp",
+      "fft"
+    ],
+    "error_turns": [
+      2
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00091",
+    "problem_id": "1109D",
+    "source": "original",
+    "rating": 2400,
+    "difficulty": "very_hard",
+    "depth": 4,
+    "num_turns": 4,
+    "num_injections": 1,
+    "total_test_cases": 18,
+    "codeforces_tags": [
+      "brute force",
+      "combinatorics",
+      "dp",
+      "math",
+      "trees"
+    ],
+    "error_turns": [
+      2
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00092",
+    "problem_id": "1142c",
+    "source": "expanded",
+    "rating": 2400,
+    "difficulty": "very_hard",
+    "depth": 4,
+    "num_turns": 4,
+    "num_injections": 1,
+    "total_test_cases": 11,
+    "codeforces_tags": [
+      "geometry"
+    ],
+    "error_turns": [
+      1
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00093",
+    "problem_id": "1194F",
+    "source": "original",
+    "rating": 2400,
+    "difficulty": "very_hard",
+    "depth": 4,
+    "num_turns": 4,
+    "num_injections": 1,
+    "total_test_cases": 17,
+    "codeforces_tags": [
+      "combinatorics",
+      "dp",
+      "number theory",
+      "probabilities",
+      "two pointers"
+    ],
+    "error_turns": [
+      3
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00094",
+    "problem_id": "1526E",
+    "source": "original",
+    "rating": 2400,
+    "difficulty": "very_hard",
+    "depth": 4,
+    "num_turns": 4,
+    "num_injections": 1,
+    "total_test_cases": 12,
+    "codeforces_tags": [
+      "combinatorics",
+      "constructive algorithms",
+      "math"
+    ],
+    "error_turns": [
+      3
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00095",
+    "problem_id": "1905E",
+    "source": "original",
+    "rating": 2400,
+    "difficulty": "very_hard",
+    "depth": 4,
+    "num_turns": 4,
+    "num_injections": 1,
+    "total_test_cases": 10,
+    "codeforces_tags": [
+      "combinatorics",
+      "dfs and similar",
+      "dp",
+      "math",
+      "trees"
+    ],
+    "error_turns": [
+      1
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00096",
+    "problem_id": "632F",
+    "source": "expanded",
+    "rating": 2400,
+    "difficulty": "very_hard",
+    "depth": 4,
+    "num_turns": 4,
+    "num_injections": 2,
+    "total_test_cases": 18,
+    "codeforces_tags": [
+      "brute force",
+      "divide and conquer",
+      "graphs",
+      "matrices",
+      "trees"
+    ],
+    "error_turns": [
+      2,
+      3
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00097",
+    "problem_id": "825F",
+    "source": "original",
+    "rating": 2400,
+    "difficulty": "very_hard",
+    "depth": 4,
+    "num_turns": 4,
+    "num_injections": 2,
+    "total_test_cases": 12,
+    "codeforces_tags": [
+      "dp",
+      "hashing",
+      "string suffix structures",
+      "strings"
+    ],
+    "error_turns": [
+      1,
+      2
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00098",
+    "problem_id": "912E",
+    "source": "expanded",
+    "rating": 2400,
+    "difficulty": "very_hard",
+    "depth": 4,
+    "num_turns": 3,
+    "num_injections": 1,
+    "total_test_cases": 7,
+    "codeforces_tags": [
+      "binary search",
+      "dfs and similar",
+      "math",
+      "meet-in-the-middle",
+      "number theory",
+      "two pointers"
+    ],
+    "error_turns": [
+      1
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00100",
+    "problem_id": "1042E",
+    "source": "original",
+    "rating": 2300,
+    "difficulty": "very_hard",
+    "depth": 4,
+    "num_turns": 4,
+    "num_injections": 1,
+    "total_test_cases": 14,
+    "codeforces_tags": [
+      "dp",
+      "math",
+      "probabilities"
+    ],
+    "error_turns": [
+      3
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00101",
+    "problem_id": "1065E",
+    "source": "original",
+    "rating": 2300,
+    "difficulty": "very_hard",
+    "depth": 4,
+    "num_turns": 4,
+    "num_injections": 1,
+    "total_test_cases": 15,
+    "codeforces_tags": [
+      "combinatorics",
+      "strings"
+    ],
+    "error_turns": [
+      1
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00102",
+    "problem_id": "1073E",
+    "source": "original",
+    "rating": 2300,
+    "difficulty": "very_hard",
+    "depth": 4,
+    "num_turns": 4,
+    "num_injections": 1,
+    "total_test_cases": 15,
+    "codeforces_tags": [
+      "bitmasks",
+      "combinatorics",
+      "dp",
+      "math"
+    ],
+    "error_turns": [
+      2
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00103",
+    "problem_id": "1139D",
+    "source": "original",
+    "rating": 2300,
+    "difficulty": "very_hard",
+    "depth": 4,
+    "num_turns": 4,
+    "num_injections": 1,
+    "total_test_cases": 18,
+    "codeforces_tags": [
+      "dp",
+      "math",
+      "number theory",
+      "probabilities"
+    ],
+    "error_turns": [
+      3
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00104",
+    "problem_id": "1156F",
+    "source": "original",
+    "rating": 2300,
+    "difficulty": "very_hard",
+    "depth": 4,
+    "num_turns": 4,
+    "num_injections": 1,
+    "total_test_cases": 15,
+    "codeforces_tags": [
+      "dp",
+      "math",
+      "probabilities"
+    ],
+    "error_turns": [
+      1
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00099",
+    "problem_id": "1342E",
+    "source": "original",
+    "rating": 2300,
+    "difficulty": "very_hard",
+    "depth": 5,
+    "num_turns": 5,
+    "num_injections": 1,
+    "total_test_cases": 21,
+    "codeforces_tags": [
+      "combinatorics",
+      "fft",
+      "math"
+    ],
+    "error_turns": [
+      1
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00105",
+    "problem_id": "2035E",
+    "source": "original",
+    "rating": 2300,
+    "difficulty": "very_hard",
+    "depth": 4,
+    "num_turns": 3,
+    "num_injections": 2,
+    "total_test_cases": 12,
+    "codeforces_tags": [
+      "binary search",
+      "brute force",
+      "constructive algorithms",
+      "greedy",
+      "implementation",
+      "math",
+      "ternary search"
+    ],
+    "error_turns": [
+      1,
+      2
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00107",
+    "problem_id": "1097D",
+    "source": "original",
+    "rating": 2200,
+    "difficulty": "very_hard",
+    "depth": 4,
+    "num_turns": 4,
+    "num_injections": 1,
+    "total_test_cases": 12,
+    "codeforces_tags": [
+      "dp",
+      "math",
+      "number theory",
+      "probabilities"
+    ],
+    "error_turns": [
+      2
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00108",
+    "problem_id": "1140E",
+    "source": "original",
+    "rating": 2200,
+    "difficulty": "very_hard",
+    "depth": 4,
+    "num_turns": 4,
+    "num_injections": 1,
+    "total_test_cases": 15,
+    "codeforces_tags": [
+      "combinatorics",
+      "divide and conquer",
+      "dp"
+    ],
+    "error_turns": [
+      3
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00109",
+    "problem_id": "1334E",
+    "source": "original",
+    "rating": 2200,
+    "difficulty": "very_hard",
+    "depth": 4,
+    "num_turns": 3,
+    "num_injections": 1,
+    "total_test_cases": 9,
+    "codeforces_tags": [
+      "combinatorics",
+      "graphs",
+      "greedy",
+      "math",
+      "number theory"
+    ],
+    "error_turns": [
+      1
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00110",
+    "problem_id": "1926F",
+    "source": "original",
+    "rating": 2200,
+    "difficulty": "very_hard",
+    "depth": 4,
+    "num_turns": 4,
+    "num_injections": 2,
+    "total_test_cases": 10,
+    "codeforces_tags": [
+      "bitmasks",
+      "brute force",
+      "dfs and similar",
+      "dp",
+      "implementation"
+    ],
+    "error_turns": [
+      1,
+      2
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00106",
+    "problem_id": "413E",
+    "source": "original",
+    "rating": 2200,
+    "difficulty": "very_hard",
+    "depth": 5,
+    "num_turns": 4,
+    "num_injections": 2,
+    "total_test_cases": 15,
+    "codeforces_tags": [
+      "data structures",
+      "divide and conquer"
+    ],
+    "error_turns": [
+      1,
+      3
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00111",
+    "problem_id": "903E",
+    "source": "original",
+    "rating": 2200,
+    "difficulty": "very_hard",
+    "depth": 4,
+    "num_turns": 4,
+    "num_injections": 2,
+    "total_test_cases": 12,
+    "codeforces_tags": [
+      "brute force",
+      "hashing",
+      "implementation",
+      "strings"
+    ],
+    "error_turns": [
+      1,
+      2
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00112",
+    "problem_id": "920G",
+    "source": "expanded",
+    "rating": 2200,
+    "difficulty": "very_hard",
+    "depth": 4,
+    "num_turns": 4,
+    "num_injections": 1,
+    "total_test_cases": 9,
+    "codeforces_tags": [
+      "binary search",
+      "bitmasks",
+      "brute force",
+      "combinatorics",
+      "math",
+      "number theory"
+    ],
+    "error_turns": [
+      3
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00113",
+    "problem_id": "1511E",
+    "source": "original",
+    "rating": 2100,
+    "difficulty": "hard",
+    "depth": 5,
+    "num_turns": 5,
+    "num_injections": 1,
+    "total_test_cases": 21,
+    "codeforces_tags": [
+      "combinatorics",
+      "dp",
+      "greedy",
+      "math"
+    ],
+    "error_turns": [
+      2
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00116",
+    "problem_id": "1525E",
+    "source": "original",
+    "rating": 2100,
+    "difficulty": "hard",
+    "depth": 4,
+    "num_turns": 4,
+    "num_injections": 1,
+    "total_test_cases": 9,
+    "codeforces_tags": [
+      "combinatorics",
+      "dp",
+      "math",
+      "probabilities",
+      "two pointers"
+    ],
+    "error_turns": [
+      2
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00117",
+    "problem_id": "1553E",
+    "source": "original",
+    "rating": 2100,
+    "difficulty": "hard",
+    "depth": 4,
+    "num_turns": 4,
+    "num_injections": 3,
+    "total_test_cases": 10,
+    "codeforces_tags": [
+      "brute force",
+      "combinatorics",
+      "constructive algorithms",
+      "dfs and similar",
+      "dsu",
+      "graphs",
+      "math"
+    ],
+    "error_turns": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00118",
+    "problem_id": "1811G1",
+    "source": "original",
+    "rating": 2100,
+    "difficulty": "hard",
+    "depth": 4,
+    "num_turns": 4,
+    "num_injections": 2,
+    "total_test_cases": 12,
+    "codeforces_tags": [
+      "combinatorics",
+      "dp",
+      "math"
+    ],
+    "error_turns": [
+      1,
+      3
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00114",
+    "problem_id": "336D",
+    "source": "original",
+    "rating": 2100,
+    "difficulty": "hard",
+    "depth": 5,
+    "num_turns": 3,
+    "num_injections": 1,
+    "total_test_cases": 9,
+    "codeforces_tags": [
+      "combinatorics",
+      "math",
+      "number theory"
+    ],
+    "error_turns": [
+      1
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00115",
+    "problem_id": "431D",
+    "source": "original",
+    "rating": 2100,
+    "difficulty": "hard",
+    "depth": 5,
+    "num_turns": 3,
+    "num_injections": 1,
+    "total_test_cases": 9,
+    "codeforces_tags": [
+      "binary search",
+      "bitmasks",
+      "combinatorics",
+      "dp",
+      "math"
+    ],
+    "error_turns": [
+      2
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00119",
+    "problem_id": "748E",
+    "source": "original",
+    "rating": 2100,
+    "difficulty": "hard",
+    "depth": 4,
+    "num_turns": 4,
+    "num_injections": 1,
+    "total_test_cases": 12,
+    "codeforces_tags": [
+      "binary search",
+      "data structures",
+      "greedy",
+      "two pointers"
+    ],
+    "error_turns": [
+      3
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00120",
+    "problem_id": "919E",
+    "source": "original",
+    "rating": 2100,
+    "difficulty": "hard",
+    "depth": 4,
+    "num_turns": 4,
+    "num_injections": 3,
+    "total_test_cases": 12,
+    "codeforces_tags": [
+      "chinese remainder theorem",
+      "math",
+      "number theory"
+    ],
+    "error_turns": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00121",
+    "problem_id": "137E",
+    "source": "original",
+    "rating": 2000,
+    "difficulty": "hard",
+    "depth": 5,
+    "num_turns": 5,
+    "num_injections": 4,
+    "total_test_cases": 15,
+    "codeforces_tags": [
+      "data structures",
+      "implementation",
+      "strings"
+    ],
+    "error_turns": [
+      1,
+      2,
+      3,
+      4
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00122",
+    "problem_id": "1506F",
+    "source": "original",
+    "rating": 2000,
+    "difficulty": "hard",
+    "depth": 4,
+    "num_turns": 4,
+    "num_injections": 1,
+    "total_test_cases": 12,
+    "codeforces_tags": [
+      "constructive algorithms",
+      "graphs",
+      "math",
+      "shortest paths",
+      "sortings"
+    ],
+    "error_turns": [
+      0
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00123",
+    "problem_id": "1931G",
+    "source": "original",
+    "rating": 2000,
+    "difficulty": "hard",
+    "depth": 4,
+    "num_turns": 4,
+    "num_injections": 2,
+    "total_test_cases": 10,
+    "codeforces_tags": [
+      "combinatorics",
+      "math",
+      "number theory"
+    ],
+    "error_turns": [
+      2,
+      3
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00124",
+    "problem_id": "509E",
+    "source": "original",
+    "rating": 2000,
+    "difficulty": "hard",
+    "depth": 4,
+    "num_turns": 4,
+    "num_injections": 1,
+    "total_test_cases": 12,
+    "codeforces_tags": [
+      "math",
+      "strings"
+    ],
+    "error_turns": [
+      1
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00125",
+    "problem_id": "578C",
+    "source": "original",
+    "rating": 2000,
+    "difficulty": "hard",
+    "depth": 4,
+    "num_turns": 4,
+    "num_injections": 2,
+    "total_test_cases": 12,
+    "codeforces_tags": [
+      "ternary search"
+    ],
+    "error_turns": [
+      1,
+      2
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00126",
+    "problem_id": "961D",
+    "source": "original",
+    "rating": 2000,
+    "difficulty": "hard",
+    "depth": 4,
+    "num_turns": 3,
+    "num_injections": 1,
+    "total_test_cases": 12,
+    "codeforces_tags": [
+      "geometry"
+    ],
+    "error_turns": [
+      1
+    ]
+  },
+  {
+    "trace_id": "TB_HARD_00127",
+    "problem_id": "997B",
+    "source": "original",
+    "rating": 2000,
+    "difficulty": "hard",
+    "depth": 4,
+    "num_turns": 3,
+    "num_injections": 1,
+    "total_test_cases": 9,
+    "codeforces_tags": [
+      "brute force",
+      "combinatorics",
+      "dp",
+      "greedy",
+      "math"
+    ],
+    "error_turns": [
+      2
+    ]
+  }
+]

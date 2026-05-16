@@ -1,0 +1,422 @@
+# =====================================================================
+#  TraceBench-Full — Master Pipeline
+#  Single source of truth for: what to run, what gets produced, where.
+#  Run via `make all` (Makefile is a thin wrapper) or directly invoke
+#  `python code/scripts/<NN_name>.py --config pipeline.yaml --stage <name>`.
+#
+#  Conventions:
+#    - All paths are relative to the repo root unless absolute.
+#    - $WORKSPACE is `out/` (gitignored).
+#    - Every output declared below is the ONLY canonical location of
+#      that artifact. Downstream stages read from this path, never from
+#      ad-hoc files.
+#    - Cost estimates are USD-only; local-model GPU time is wall-clock.
+# =====================================================================
+version: 1
+project: tracebench
+paper_target: ACL 2026
+
+# ---------------------------------------------------------------------
+# Global settings (override at CLI with --override KEY=VAL)
+# ---------------------------------------------------------------------
+defaults:
+  python: python3
+  pythonpath: code/src             # so `from tracebench...` resolves
+  workspace: out                   # gitignored runtime root
+  data_dir: data
+  paper_dir: code/paper
+  seed: 12345
+
+# ---------------------------------------------------------------------
+# Model registry. Each entry refers to a YAML in code/configs/models/
+# ---------------------------------------------------------------------
+models:
+  - id: qwen3_5_27b
+    config: code/configs/models/qwen3_5_27b.yaml
+    access: local                  # local | api
+    estimated_h100_hours: 2.1
+    estimated_api_usd: 0
+  - id: qwen3_6_27b
+    config: code/configs/models/qwen3_6_27b.yaml
+    access: local
+    estimated_h100_hours: 2.0
+    estimated_api_usd: 0
+  - id: qwen3_6_35b_a3b
+    config: code/configs/models/qwen3_6_35b_a3b.yaml
+    access: local
+    estimated_h100_hours: 1.4
+    estimated_api_usd: 0
+  - id: glm_47_flash
+    config: code/configs/models/glm_47_flash.yaml
+    access: local
+    estimated_h100_hours: 1.7
+    estimated_api_usd: 0
+  - id: deepseek_r1_32b
+    config: code/configs/models/deepseek_r1_32b.yaml
+    access: local
+    estimated_h100_hours: 2.5
+    estimated_api_usd: 0
+  - id: gemini_31_pro
+    config: code/configs/models/gemini_31_pro.yaml
+    access: api
+    estimated_h100_hours: 0
+    estimated_api_usd: 97.4        # Gemini-3.1-Pro Standard @ 8K/2K tokens × 2402 calls
+
+# ---------------------------------------------------------------------
+# Split registry
+# ---------------------------------------------------------------------
+splits:
+  full:
+    path: data/tracebench_full.json
+    n_problems: 818
+    n_turn_rounds: 2377
+    is_primary_run_target: true
+  hard:
+    path: data/tracebench_hard.json
+    n_problems: 128
+    n_turn_rounds: 438
+    derived_from: full              # Hard ⊂ Full; we DERIVE not re-run
+    derivation_key: problem_id      # 128/128 overlap verified 2026-05-15
+  calibration_30:
+    path: code/configs/splits/calibration_30.json   # 10 Easy/Med + 10 Hard + 10 VeryHard+
+    n_problems: 30
+    is_primary_run_target: false
+    purpose: Day-0 dry-run only
+
+# ---------------------------------------------------------------------
+# STAGES — each declares: inputs, outputs, command, deps, est cost.
+# Run topologically via Makefile or `python pipeline_runner.py`.
+# ---------------------------------------------------------------------
+stages:
+
+  # -------------------------------------------------------------------
+  # 0. label_active_faults — one-time CPU prep, ~45 min on 8-way
+  # -------------------------------------------------------------------
+  label_active_faults:
+    description: |
+      Counterfactual replay labeling: for each error-turn, mark which
+      injections are *active* (their CF revert flips ≥1 failing test).
+      6-tier output: active / active_relaxed / inactive_no_failure /
+      inactive_cf_no_fix / inactive_unknown / trusted.
+    needs: []
+    inputs:
+      - data/tracebench_full.json
+      - data/tracebench_hard.json
+    outputs:
+      - data/derived/tracebench_full_labeled.json
+      - data/derived/tracebench_hard_labeled.json
+      - out/analysis/active_fault_label_summary.csv
+    commands:
+      - >
+        python code/scripts/01_label_active_faults.py
+        --input data/tracebench_full.json
+        --output data/derived/tracebench_full_labeled.json
+        --workers 8
+      - >
+        python code/scripts/01_label_active_faults.py
+        --input data/tracebench_hard.json
+        --output data/derived/tracebench_hard_labeled.json
+        --workers 8
+      - >
+        python code/scripts/01_label_active_faults.py --summary-only
+        --inputs data/derived/tracebench_full_labeled.json data/derived/tracebench_hard_labeled.json
+        --output-csv out/analysis/active_fault_label_summary.csv
+    estimated:
+      wall_clock_minutes: 45         # 1292 sandbox replays @ 8-way
+      cost_usd: 0
+      gpu_hours: 0
+
+  # -------------------------------------------------------------------
+  # 1. dry_run — Day 0 calibration, ALL 6 models × 30 stratified tasks
+  # -------------------------------------------------------------------
+  dry_run:
+    description: |
+      Day-0 pre-flight on 30 stratified tasks (10 each from Easy/Med,
+      Hard, VeryHard+). Confirms parse rates, latency, Gemini cost
+      projection, prompt-format compatibility per model.
+    needs: [label_active_faults]
+    inputs:
+      - data/derived/tracebench_full_labeled.json
+      - code/configs/splits/calibration_30.json
+    outputs:
+      - out/dry_run/<model>_calibration.jsonl          # per-task raw
+      - out/dry_run/calibration_summary.csv            # 6 rows
+      - out/dry_run/calibration_report.md
+    commands:
+      - >
+        python code/scripts/00_dry_run_calibration.py
+        --config pipeline.yaml
+        --output-dir out/dry_run/
+    estimated:
+      wall_clock_minutes: 60         # 30 tasks × 6 models × ~20 s
+      cost_usd: 5                    # Gemini's share is ~$3-4
+      gpu_hours: 0.5
+    gate:
+      description: |
+        After dry_run, INSPECT calibration_summary.csv. Block main run if:
+        - any model parse_ok < 80%
+        - Gemini projected_full_usd > $250 (sanity)
+        - any model timeout_rate > 20%
+
+  # -------------------------------------------------------------------
+  # 2. run_evaluation — 6 model × Full single seed.
+  #    Each cell is RESUMABLE via checkpoint jsonl.
+  # -------------------------------------------------------------------
+  run_evaluation:
+    description: |
+      6 models × Full split (818 problems). Each model is one
+      independent run; Hard is derived later via problem_id slicing.
+      Outputs per-attempt records: {code_before, generated_code,
+      edited_lines, blame_spans, patch_spans, per_test_results, success}.
+    needs: [label_active_faults, dry_run]
+    parallelizable_per: model        # H100 jobs serial; API can run in parallel
+    inputs:
+      - data/derived/tracebench_full_labeled.json
+      - code/configs/models/<model>.yaml
+    outputs:
+      - out/checkpoints/<model>_full.jsonl
+      - out/records/<model>_full_records.jsonl
+      - out/records/<model>_full_summary.json          # aggregates
+    commands:
+      # Local models — one at a time on H100
+      - >
+        python code/scripts/02_run_evaluation.py
+        --config pipeline.yaml --model qwen3_5_27b --split full
+      - >
+        python code/scripts/02_run_evaluation.py
+        --config pipeline.yaml --model qwen3_6_27b --split full
+      - >
+        python code/scripts/02_run_evaluation.py
+        --config pipeline.yaml --model qwen3_6_35b_a3b --split full
+      - >
+        python code/scripts/02_run_evaluation.py
+        --config pipeline.yaml --model glm_47_flash --split full
+      - >
+        python code/scripts/02_run_evaluation.py
+        --config pipeline.yaml --model deepseek_r1_32b --split full
+      # API — run in parallel with local
+      - >
+        python code/scripts/02_run_evaluation.py
+        --config pipeline.yaml --model gemini_31_pro --split full
+    estimated:
+      wall_clock_hours: 12             # 11.7 H100-h + 4h Gemini parallel
+      cost_usd: 97                     # Gemini only
+      gpu_hours: 11.7
+
+  # -------------------------------------------------------------------
+  # 3. analyze — generate ALL CSV tables from the 6 records.jsonl files
+  #    THIS IS THE ONLY PLACE NUMBERS ARE COMPUTED. The paper reads
+  #    these CSVs via render_tex; never write numbers by hand.
+  # -------------------------------------------------------------------
+  analyze:
+    description: |
+      Single-pass analysis: ingests 6 records.jsonl + active_fault
+      labels, produces all 8 CSV tables + JSON consistency object.
+    needs: [run_evaluation, label_active_faults]
+    inputs:
+      - out/records/*_full_records.jsonl              # 6 files
+      - data/derived/tracebench_full_labeled.json
+      - data/derived/tracebench_hard_labeled.json
+    outputs:
+      - out/tables/main_gap_table.csv                 # 12 rows × 11 cols (Tab 4)
+      - out/tables/difficulty_bins.csv                # 3 bands (App E.3)
+      - out/tables/fault_family_distribution.csv      # 5 families (Tab 5 / dataset-derived)
+      - out/tables/fault_family_performance.csv       # 5 × 5 metrics (App E.4)
+      - out/tables/outside_g_regression.csv           # r, p, n, CI per model + pooled
+      - out/tables/early_drift.csv                    # Miss−Hit deltas
+      - out/tables/failure_modes.csv                  # 5 modes × 6 models
+      - out/tables/cost_accounting.csv                # per-model from logs
+      - out/analysis/per_edit_scatter.jsonl           # for fig_micro_propagation
+      - out/analysis/per_turn_curves.json             # for fig_micro_drift
+      - out/analysis/numbers.json                     # ALL scalar claims (r, n, p, CI, ...)
+    commands:
+      - >
+        python code/scripts/03_analyze.py
+        --config pipeline.yaml
+        --records-dir out/records/
+        --labeled-full data/derived/tracebench_full_labeled.json
+        --labeled-hard data/derived/tracebench_hard_labeled.json
+        --output-dir out/
+    estimated:
+      wall_clock_minutes: 30
+      cost_usd: 0
+      gpu_hours: 0
+
+  # -------------------------------------------------------------------
+  # 4. make_figures — generate ALL PDFs (matplotlib) from analyze outputs
+  # -------------------------------------------------------------------
+  make_figures:
+    description: |
+      Generate the 3 main multi-panel PDF figures used in the paper.
+      Reads from out/tables/*.csv and out/analysis/*.jsonl, NEVER from
+      hand-edited paper artifacts. Output PDFs are included by LaTeX.
+    needs: [analyze]
+    inputs:
+      - out/tables/main_gap_table.csv
+      - out/tables/difficulty_bins.csv
+      - out/analysis/per_edit_scatter.jsonl
+      - out/analysis/per_turn_curves.json
+      - out/tables/failure_modes.csv
+    outputs:
+      - code/paper/figures/fig_macro_outcome.pdf
+      - code/paper/figures/fig_micro_propagation.pdf
+      - code/paper/figures/fig_micro_drift.pdf
+    commands:
+      - >
+        python code/scripts/04_make_figures.py
+        --config pipeline.yaml
+        --analysis-dir out/
+        --output-dir code/paper/figures/
+    estimated:
+      wall_clock_minutes: 5
+      cost_usd: 0
+
+  # -------------------------------------------------------------------
+  # 5. render_tex — write numbers.tex and table .tex includes
+  #    SO MAIN.TEX NEVER HAS HARD-CODED NUMBERS. Every claim flows
+  #    through this stage; consistency_check ensures none leak.
+  # -------------------------------------------------------------------
+  render_tex:
+    description: |
+      For every scalar in out/analysis/numbers.json, write a
+      \newcommand into code/paper/numbers.tex. For every CSV in
+      out/tables/, write a LaTeX table fragment into
+      code/paper/tables/. main.tex \input's these only.
+    needs: [analyze]
+    inputs:
+      - out/analysis/numbers.json
+      - out/tables/*.csv
+    outputs:
+      - code/paper/numbers.tex                        # \newcommand defs
+      - code/paper/tables/tab_main_gap.tex
+      - code/paper/tables/tab_fault_family.tex
+      - code/paper/tables/tab_difficulty_bands.tex
+      - code/paper/tables/tab_fault_family_perf.tex
+      - code/paper/tables/tab_failure_modes.tex
+      - code/paper/tables/tab_early_drift.tex
+      - code/paper/tables/tab_cost_accounting.tex
+    commands:
+      - >
+        python code/scripts/05_render_tex.py
+        --config pipeline.yaml
+        --analysis-dir out/
+        --paper-dir code/paper/
+    estimated:
+      wall_clock_minutes: 1
+      cost_usd: 0
+
+  # -------------------------------------------------------------------
+  # 6. consistency_check — guardrail before any PDF leaves the building.
+  # -------------------------------------------------------------------
+  consistency_check:
+    description: |
+      Hard-fail if any of:
+      - main.tex contains hand-typed numbers that disagree with numbers.tex
+      - "mock" or "TODO" or "TBD" or "\todo" strings remain in main.tex
+      - main_gap_table row count != models × splits
+      - outside_g r/n disagree between numbers.json and figure annotations
+      - hard records !⊂ full records (problem_id check)
+      - cost_accounting calls != sum(turns) from records
+      - any \newcommand referenced in main.tex is missing from numbers.tex
+    needs: [render_tex, make_figures]
+    inputs:
+      - code/paper/main.tex
+      - code/paper/numbers.tex
+      - out/analysis/numbers.json
+      - out/tables/*.csv
+      - out/records/*_records.jsonl
+    outputs:
+      - out/analysis/consistency_report.md            # exit code 0 = pass
+    commands:
+      - >
+        python code/scripts/06_consistency_check.py
+        --config pipeline.yaml --strict
+    estimated:
+      wall_clock_minutes: 2
+      cost_usd: 0
+    failure_mode: hard               # exit non-zero blocks `make paper`
+
+  # -------------------------------------------------------------------
+  # 7. compile_paper — pdflatex + bibtex
+  # -------------------------------------------------------------------
+  compile_paper:
+    description: pdflatex + bibtex + pdflatex × 2 (resolve refs).
+    needs: [render_tex, make_figures, consistency_check]
+    inputs:
+      - code/paper/main.tex
+      - code/paper/numbers.tex
+      - code/paper/tables/*.tex
+      - code/paper/figures/*.pdf
+      - code/paper/custom.bib
+    outputs:
+      - code/paper/main.pdf
+    commands:
+      - cd code/paper && pdflatex -interaction=nonstopmode main.tex
+      - cd code/paper && bibtex main
+      - cd code/paper && pdflatex -interaction=nonstopmode main.tex
+      - cd code/paper && pdflatex -interaction=nonstopmode main.tex
+    estimated:
+      wall_clock_minutes: 1
+
+# ---------------------------------------------------------------------
+# Cost & time roll-up (used by `make estimate` for sanity reporting)
+# ---------------------------------------------------------------------
+budget:
+  api_usd: 97.4                      # 1 model × 1 split × 1 seed
+  api_buffer_pct: 35                 # 35% buffer for retries / rate limits
+  api_total_with_buffer: 132         # ≈ ceil(97.4 * 1.35)
+  h100_hours: 11.7
+  total_wall_clock_days: 4           # Day 0 dry-run + 2 day server + 1 day paper
+
+# ---------------------------------------------------------------------
+# Pre-flight invariants — must be true before ANY stage runs.
+# Checked by Makefile's `make verify-env`.
+# ---------------------------------------------------------------------
+invariants:
+  - name: hard_is_subset_of_full
+    description: 128/128 Hard problem_ids must appear in Full
+    check: python code/scripts/00_verify_subset.py
+  - name: python_version
+    description: Python >= 3.9
+    check: python -c "import sys; assert sys.version_info >= (3,9)"
+  - name: data_files_present
+    files:
+      - data/tracebench_full.json
+      - data/tracebench_hard.json
+      - data/oracle_spans.json
+  - name: env_vars
+    optional_env_vars:                # required only if API rows are in the matrix
+      - GOOGLE_API_KEY               # for Gemini
+      - HF_TOKEN                     # for local model downloads if gated
+
+# ---------------------------------------------------------------------
+# Output layout summary (for human readers; not consumed by scripts)
+# ---------------------------------------------------------------------
+output_layout: |
+  out/
+  ├── dry_run/
+  │   ├── <model>_calibration.jsonl   ← per-task raw, one file per model
+  │   ├── calibration_summary.csv     ← 6 rows: parse_ok, latency, cost projection
+  │   └── calibration_report.md       ← human-readable Day-0 report
+  ├── checkpoints/
+  │   └── <model>_full.jsonl          ← resumable checkpoint for run_evaluation
+  ├── records/
+  │   ├── <model>_full_records.jsonl  ← per-problem records (input to analyze)
+  │   └── <model>_full_summary.json   ← aggregate metrics
+  ├── analysis/
+  │   ├── numbers.json                ← ALL scalar claims (single source)
+  │   ├── per_edit_scatter.jsonl      ← for fig_micro_propagation
+  │   ├── per_turn_curves.json        ← for fig_micro_drift
+  │   ├── active_fault_label_summary.csv
+  │   └── consistency_report.md       ← guardrail output
+  ├── tables/                         ← all 8 CSVs derived from records
+  │   ├── main_gap_table.csv          → renders to tab_main_gap.tex
+  │   ├── difficulty_bins.csv         → renders to tab_difficulty_bands.tex
+  │   ├── fault_family_distribution.csv
+  │   ├── fault_family_performance.csv
+  │   ├── outside_g_regression.csv
+  │   ├── early_drift.csv
+  │   ├── failure_modes.csv
+  │   └── cost_accounting.csv
+  └── figures/                        ← matplotlib intermediate dumps
+      (final PDFs land in code/paper/figures/)

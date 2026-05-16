@@ -1,0 +1,17 @@
+# Day-0 dry-run subset — 30 stratified problems for calibration only.
+# Membership is computed at runtime by code/scripts/00_dry_run_calibration.py
+# using a fixed seed so the same 30 problems are picked across models.
+id: calibration_30
+description: |
+  10 problems uniformly sampled from each difficulty band:
+    - Easy/Medium  (difficulty in {easy, medium, unrated})
+    - Hard         (difficulty == "hard")
+    - VeryHard+    (difficulty in {very_hard, extreme})
+purpose: dry_run_only
+source_split: full
+seed: 12345
+n_per_band: 10
+bands:
+  easy_med:       [easy, medium, unrated]
+  hard:           [hard]
+  very_hard_plus: [very_hard, extreme]

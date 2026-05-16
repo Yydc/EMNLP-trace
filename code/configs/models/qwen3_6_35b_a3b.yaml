@@ -1,0 +1,20 @@
+# Qwen3.6-35B-A3B — MoE flagship, 3B active params
+id: qwen3_6_35b_a3b
+display_name: Qwen3.6-35B-A3B
+family: open_moe
+access: local
+backend: vllm
+hf_repo: Qwen/Qwen3.6-35B-A3B
+quantization: bf16              # 3B active fits easily; AWQ available if OOM
+gpu_memory_utilization: 0.92
+max_model_len: 32768
+vllm_port: 8000
+temperature: 0.2
+top_p: 0.95
+max_output_tokens: 4096
+seed: 12345
+t_max: 5
+prompt_template: full_transcript
+require_blame_json: true
+estimated_h100_hours_full: 1.4   # 3B-active MoE is fastest on H100
+estimated_api_usd_full: 0

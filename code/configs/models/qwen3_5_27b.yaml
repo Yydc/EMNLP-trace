@@ -1,0 +1,28 @@
+# Qwen3.5-27B — open-weight dense reference model
+id: qwen3_5_27b
+display_name: Qwen3.5-27B
+family: open_dense
+access: local
+
+# vLLM launch
+backend: vllm
+hf_repo: Qwen/Qwen3.5-27B
+quantization: bf16
+gpu_memory_utilization: 0.92
+max_model_len: 32768
+vllm_port: 8000
+
+# Decoding
+temperature: 0.2
+top_p: 0.95
+max_output_tokens: 4096
+seed: 12345
+
+# Multi-turn protocol
+t_max: 5                            # max submission attempts per problem
+prompt_template: full_transcript    # H_t (default)
+require_blame_json: true            # model must emit blame_spans field
+
+# Cost accounting
+estimated_h100_hours_full: 2.1
+estimated_api_usd_full: 0

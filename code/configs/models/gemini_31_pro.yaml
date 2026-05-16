@@ -1,0 +1,46 @@
+# Gemini-3.1-Pro Preview — closed frontier anchor
+id: gemini_31_pro
+display_name: Gemini-3.1-Pro Preview
+family: closed_frontier
+access: api
+backend: google
+api_env_var: GOOGLE_API_KEY      # caller must export
+api_model_id: gemini-3.1-pro-preview
+
+# Decoding
+temperature: 0.2
+top_p: 0.95
+max_output_tokens: 4096
+seed: 12345                       # passed to Gemini API where supported
+
+# Multi-turn protocol — same as local
+t_max: 5
+prompt_template: full_transcript
+require_blame_json: true
+
+# Pricing assumptions (Standard tier, May 2026)
+pricing:
+  input_usd_per_million: 2.00
+  output_usd_per_million: 12.00
+  batch_input_usd_per_million: 1.00   # NOT used: Batch SLA is 24h async
+  batch_output_usd_per_million: 6.00
+
+# Rate-limit config
+rate_limit:
+  rpm: 60                          # default paid tier
+  tpm: 4000000
+  retry_max_attempts: 5
+  retry_backoff_seconds: [2, 5, 15, 60, 180]
+  concurrency: 8                    # safe headroom under default tier
+
+# Cost estimate (single Full pass @ 8K input + 2K output × 2402 turn-rounds)
+estimated_h100_hours_full: 0
+estimated_api_usd_full: 97.4
+
+notes: |
+  - DO NOT use Batch API: 24h async SLA × 3 waves can push to 72h,
+    losing the wall-clock budget. Standard sync is the choice.
+  - Disable thinking-mode (cost can balloon silently). Pass
+    thinking_config={"include_thoughts": false} if SDK supports it.
+  - Single-seed only — no API bootstrap. Hard CIs come from task-bootstrap
+    over fixed single-run trajectories.

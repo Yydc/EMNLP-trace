@@ -1,0 +1,10 @@
+# TraceBench dataset-generation deps (heavy: vLLM / torch).
+# Only needed if you rebuild the 818-split from CodeFlowBench source.
+# Evaluation users should use requirements-eval.txt instead.
+vllm==0.6.2
+torch==2.1.2
+transformers==4.46.3
+transformers-stream-generator==0.0.5
+huggingface_hub
+openai>=1.51.0
+requests>=2.31.0

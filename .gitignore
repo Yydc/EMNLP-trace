@@ -1,0 +1,56 @@
+# =============================================================
+#  Runtime / generated artifacts (never commit)
+# =============================================================
+out/                                  # all evaluation outputs
+data/derived/                         # active_fault_labeler output
+code/paper/main.pdf                   # rebuildable via `make paper`
+code/paper/main.aux
+code/paper/main.bbl
+code/paper/main.blg
+code/paper/main.log
+code/paper/main.out
+# NOTE: numbers.tex, tables/*.tex, and figures/*.pdf are auto-generated
+# but the current MOCK versions are committed so the paper compiles
+# out-of-the-box for reviewers. `make tex` / `make figures` overwrite
+# them with real-run values.
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# Virtualenvs
+.venv/
+venv/
+env/
+
+# Editor / OS
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Logs / temp
+*.log
+tmp/
+sandbox_*
+
+# Large model weights (if someone downloads them into the repo)
+*.safetensors
+*.gguf
+*.bin
+hf_cache/
+
+# Backups
+*.bak
+*.backup
+*.backup-*
+
+# Project hub state (separate workspace)
+.claude/
