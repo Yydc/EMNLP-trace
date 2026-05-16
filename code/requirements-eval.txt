@@ -1,6 +1,18 @@
 # TraceBench evaluation-only deps (no GPU/no model serving)
-# Use this when running evaluate.py / tracebench_runner.py against external APIs.
+# Use this when running evaluate.py / tracebench_runner.py / multi_model_runner.py
+# against external APIs or against a local vLLM endpoint.
+
+# LLM providers
 openai>=1.51.0
 anthropic>=0.39.0
+google-generativeai>=0.8.0
+
+# HTTP + numerics
 requests>=2.31.0
 numpy>=1.26
+pandas>=2.1
+
+# Pipeline + tests + tex rendering
+pyyaml>=6.0
+pytest>=8.0
+matplotlib>=3.8

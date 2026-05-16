@@ -80,28 +80,40 @@ def main() -> None:
         print(f"resumed: {len(done)} problems already in checkpoint")
 
     # ---- Runner dispatch ----
+    # We use multi_model_runner.run_debug_session — it has the only complete
+    # multi-provider path (qwen/openai/claude/google/local). The older
+    # tracebench_runner.run_debug_session only handles Together + Anthropic.
     print(f"launching runner for {args.model} (access={model_cfg['access']})")
     try:
-        import tracebench_runner as tbr   # uses the existing implementation
-        runner = tbr.run_debug_session
+        import multi_model_runner as mmr
+        runner = mmr.run_debug_session
     except Exception as e:
-        sys.exit(f"failed to import tracebench_runner: {e}")
+        sys.exit(f"failed to import multi_model_runner: {e}")
 
-    # Set env vars from model_cfg
-    os.environ["TRACEBENCH_TEMPERATURE"] = str(model_cfg.get("temperature", 0.2))
-    os.environ["TRACEBENCH_SEED"]        = str(model_cfg.get("seed", 12345))
+    # Per-cell decoding env (read inside MultiModelGenerator._generate_openai
+    # for OpenAI-seed reproducibility).
+    os.environ["TRACEBENCH_SEED"] = str(model_cfg.get("seed", 12345))
+
+    # Resolve provider + model id, and set provider-specific env vars that
+    # MultiModelGenerator._setup_api reads.
     if model_cfg["access"] == "api" and model_cfg["backend"] == "google":
         if not os.getenv(model_cfg["api_env_var"]):
             sys.exit(f"{model_cfg['api_env_var']} not set in env")
-        os.environ["TRACEBENCH_PROVIDER"] = "google"
-        os.environ["TRACEBENCH_MODEL"]    = model_cfg["api_model_id"]
+        provider_arg = "google"
+        model_arg    = model_cfg["api_model_id"]
+        # GOOGLE_API_KEY is already in env from the caller.
     elif model_cfg["access"] == "local":
-        # Caller is responsible for `vllm serve <repo>` on $vllm_port
+        # Caller is responsible for `vllm serve <repo>` on $vllm_port.
         port = model_cfg.get("vllm_port", 8000)
-        os.environ["OPENAI_API_BASE"]     = f"http://localhost:{port}/v1"
-        os.environ["OPENAI_API_KEY"]      = "EMPTY"
-        os.environ["TRACEBENCH_PROVIDER"] = "local"
-        os.environ["TRACEBENCH_MODEL"]    = model_cfg["hf_repo"]
+        os.environ["OPENAI_API_BASE"] = f"http://localhost:{port}/v1"
+        os.environ["OPENAI_API_KEY"]  = "EMPTY"
+        provider_arg = "local"
+        model_arg    = model_cfg["hf_repo"]
+        # MultiModelGenerator(provider="local") reads OPENAI_API_BASE +
+        # OPENAI_API_KEY and uses the OpenAI-compatible client.
+    else:
+        sys.exit(f"unsupported model access/backend: "
+                 f"{model_cfg.get('access')}/{model_cfg.get('backend')}")
 
     # ---- Budget guard (per-cell) ----
     # API pricing for this model (0/0 if local)
@@ -134,8 +146,14 @@ def main() -> None:
                 break
 
             try:
-                problem_log = runner(entry, mode="baseline",
-                                     max_turns=model_cfg.get("t_max", 5))
+                problem_log = runner(
+                    entry,
+                    mode="baseline",
+                    max_turns=model_cfg.get("t_max", 5),
+                    provider=provider_arg,
+                    model=model_arg,
+                    temperature=float(model_cfg.get("temperature", 0.2)),
+                )
             except Exception as e:
                 print(f"  [{i}] {pid}: runner crashed: {e}", file=sys.stderr)
                 continue

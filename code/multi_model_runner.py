@@ -36,6 +36,11 @@ class MultiModelGenerator:
         """
         self.provider = provider.lower()
 
+        # Token usage from the most recent generate() call.
+        # Caller (run_debug_session) reads this after each call to accumulate
+        # totals for BudgetGuard.
+        self.last_usage: Dict[str, int] = {"input_tokens": 0, "output_tokens": 0}
+
         # 默认模型配置
         if model:
             self.model = model
@@ -125,9 +130,15 @@ class MultiModelGenerator:
                 temperature=temperature,
                 max_tokens=max_tokens,
             )
+            usage = getattr(response, "usage", None)
+            self.last_usage = {
+                "input_tokens":  getattr(usage, "prompt_tokens", 0) or 0,
+                "output_tokens": getattr(usage, "completion_tokens", 0) or 0,
+            }
             return response.choices[0].message.content or ""
         except Exception as e:
             print(f"Error calling {self.provider} API: {e}", file=sys.stderr)
+            self.last_usage = {"input_tokens": 0, "output_tokens": 0}
             return ""
 
     def _generate_claude(self, prompt: str, temperature: float, max_tokens: int) -> str:
@@ -146,9 +157,15 @@ class MultiModelGenerator:
                 temperature=temperature,
                 messages=[{"role": "user", "content": prompt}]
             )
+            usage = getattr(response, "usage", None)
+            self.last_usage = {
+                "input_tokens":  getattr(usage, "input_tokens", 0) or 0,
+                "output_tokens": getattr(usage, "output_tokens", 0) or 0,
+            }
             return response.content[0].text if response.content else ""
         except Exception as e:
             print(f"Error calling Claude API: {e}", file=sys.stderr)
+            self.last_usage = {"input_tokens": 0, "output_tokens": 0}
             return ""
 
     def _generate_openai(self, prompt: str, temperature: float, max_tokens: int) -> str:
@@ -176,9 +193,15 @@ class MultiModelGenerator:
                 max_tokens=max_tokens,
                 **kwargs,
             )
+            usage = getattr(response, "usage", None)
+            self.last_usage = {
+                "input_tokens":  getattr(usage, "prompt_tokens", 0) or 0,
+                "output_tokens": getattr(usage, "completion_tokens", 0) or 0,
+            }
             return response.choices[0].message.content or ""
         except Exception as e:
             print(f"Error calling OpenAI API: {e}", file=sys.stderr)
+            self.last_usage = {"input_tokens": 0, "output_tokens": 0}
             return ""
 
     def _generate_google(self, prompt: str, temperature: float, max_tokens: int) -> str:
@@ -202,6 +225,13 @@ class MultiModelGenerator:
         # Map our `temperature` and `max_tokens` to the SDK's GenerationConfig.
         # The legacy `google.generativeai` and the new `google.genai` SDKs
         # have slightly different surfaces; try each.
+        def _capture_gemini_usage(resp) -> None:
+            meta = getattr(resp, "usage_metadata", None)
+            self.last_usage = {
+                "input_tokens":  getattr(meta, "prompt_token_count", 0) or 0,
+                "output_tokens": getattr(meta, "candidates_token_count", 0) or 0,
+            }
+
         try:
             # Newer SDK (`from google import genai`)
             client = genai.Client(api_key=self.api_key)  # type: ignore[attr-defined]
@@ -213,6 +243,7 @@ class MultiModelGenerator:
                     "max_output_tokens": max_tokens,
                 },
             )
+            _capture_gemini_usage(response)
             return getattr(response, "text", None) or ""
         except (AttributeError, TypeError):
             pass
@@ -228,9 +259,11 @@ class MultiModelGenerator:
                     "max_output_tokens": max_tokens,
                 },
             )
+            _capture_gemini_usage(response)
             return getattr(response, "text", "") or ""
         except Exception as e:
             print(f"Error calling Gemini API: {e}", file=sys.stderr)
+            self.last_usage = {"input_tokens": 0, "output_tokens": 0}
             return ""
 
 
@@ -464,13 +497,25 @@ def run_debug_session(
             "solved": True,
             "first_success_turn": 0,
             "total_turns": 0,
+            "total_attempts": 0,
+            "total_input_tokens": 0,
+            "total_output_tokens": 0,
+            "turn_results": [],
             "subproblems": [sub_log],
             "file_path": file_path,
         }
 
     attempt_counter = 0
+    total_input_tokens = 0
+    total_output_tokens = 0
+    turn_results: List[Dict[str, Any]] = []
+    turn = 0  # ensure defined if loop body never runs
 
     for turn in range(1, max_turns + 1):
+        turn_input_tokens = 0
+        turn_output_tokens = 0
+        turn_attempts = 0
+        turn_solved = False
         state = {
             "file_path": Path(file_path).name,
             "last_test_output": last_trace,
@@ -515,7 +560,16 @@ def run_debug_session(
 
         for _ in range(plan.num_candidates):
             attempt_counter += 1
+            turn_attempts += 1
             raw_resp = generator.generate(prompt, temperature=plan.temperature)
+            # Capture token usage reported by the provider for this call.
+            call_in  = int(generator.last_usage.get("input_tokens", 0) or 0)
+            call_out = int(generator.last_usage.get("output_tokens", 0) or 0)
+            total_input_tokens  += call_in
+            total_output_tokens += call_out
+            turn_input_tokens   += call_in
+            turn_output_tokens  += call_out
+
             candidate_code = extract_code(raw_resp or "") if raw_resp else ""
 
             attempt_log: Dict[str, Any] = {
@@ -526,6 +580,8 @@ def run_debug_session(
                 "model": generator.model,
                 "temperature": plan.temperature,
                 "prompt_tokens": len(prompt.split()),
+                "input_tokens":  call_in,
+                "output_tokens": call_out,
                 "blame_spans": _spans_to_json(suspicious_spans),
             }
 
@@ -555,6 +611,7 @@ def run_debug_session(
 
             if success:
                 solved = True
+                turn_solved = True
                 sub_log["solved"] = True
                 first_success_turn = first_success_turn or turn
                 break
@@ -563,6 +620,14 @@ def run_debug_session(
             last_trace = trace or output
             if mode == "error_aware":
                 anchor_lines = sorted(set(anchor_lines + anchor_hits))
+
+        turn_results.append({
+            "turn": turn,
+            "attempts": turn_attempts,
+            "solved": turn_solved,
+            "input_tokens":  turn_input_tokens,
+            "output_tokens": turn_output_tokens,
+        })
 
         if solved:
             break
@@ -575,6 +640,10 @@ def run_debug_session(
         "solved": solved,
         "first_success_turn": first_success_turn,
         "total_turns": turn,
+        "total_attempts": attempt_counter,
+        "total_input_tokens":  total_input_tokens,
+        "total_output_tokens": total_output_tokens,
+        "turn_results": turn_results,
         "subproblems": [sub_log],
         "file_path": file_path,
     }
