@@ -356,10 +356,16 @@ def main() -> None:
             per_prob_rows.append({"model": model, "split": split, **p})
     write_jsonl(out_analysis / "per_problem_metrics.jsonl", per_prob_rows)
 
-    # 4. Main gap table
+    # 4. Main gap table — blame@k columns dropped (see notes):
+    # The runner in baseline mode does not produce dedicated blame predictions;
+    # blame_spans get aliased to patch_spans, and even with that the
+    # coordinate-system mismatch (labeler anchor_line in original codebase
+    # coords vs model patch_spans in per-turn snippet coords) makes blame@k
+    # uniformly 0. Use 03b_fixup_outside_g.py to get real Outside-G in
+    # snippet coords for the per-edit scatter / Pearson correlation.
     rows = build_main_gap_rows(per_problem, hard_pids)
     write_csv(out_tables / "main_gap_table.csv", rows,
-              fieldnames=["model", "split", "n", "pass1", "blame1", "blame3",
+              fieldnames=["model", "split", "n", "pass1",
                           "out_g", "reg_rate", "avg_turns", "repeats", "slope", "gap"])
 
     # 5. Outside-G / RegressionRate correlation (the paper's flagship claim)
