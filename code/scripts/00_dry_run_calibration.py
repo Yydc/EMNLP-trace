@@ -122,13 +122,14 @@ def run_one_model(model_cfg: dict, tasks: list, out_jsonl: Path,
                 break
             t0 = time.time()
             try:
-                pl = mmr.run_debug_session(
+                pl = mmr.run_multi_turn_debug_session(
                     t,
                     mode="baseline",
                     max_turns=model_cfg.get("t_max", 5),
                     provider=provider,
                     model=model_id,
                     temperature=float(model_cfg.get("temperature", 0.2)),
+                    max_attempts_per_turn=int(model_cfg.get("max_attempts_per_turn", 3)),
                 )
             except Exception as e:
                 print(f"    task {i} {t.get('problem_id')}: runner crashed: {e}",

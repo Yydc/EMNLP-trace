@@ -650,6 +650,317 @@ def run_debug_session(
     return problem_log
 
 
+def run_multi_turn_debug_session(
+    entry: Dict[str, Any],
+    mode: str = "baseline",
+    max_turns: int = 5,
+    provider: str = "qwen",
+    model: Optional[str] = None,
+    temperature: float = 0.35,
+    max_attempts_per_turn: int = 3,
+) -> Dict[str, Any]:
+    """Real multi-turn debug session against a MultiModelGenerator.
+
+    Mirrors tracebench_runner.run_multi_turn_debug_session (line 299): walks
+    entry["conversation_history"] turn-by-turn, reads per-turn test_cases /
+    target_code / context / subproblems, accumulates code across turns, and
+    enters a max_attempts_per_turn repair loop on failure.
+
+    Differs only in that it talks to MultiModelGenerator (provider switching +
+    last_usage token capture) instead of CodeGenerator (Together/Anthropic only).
+
+    All multi_turn=True entries in tracebench_full.json store their tests at
+    conversation_history[i].test_cases, NOT at evaluation.test_cases. The
+    single-turn run_debug_session above mis-reads the latter and short-circuits;
+    use this function for any multi_turn=True data.
+    """
+    # Deferred import: tracebench_runner triggers a side-effect print at import
+    # time, and we only need two helpers it owns.
+    from tracebench_runner import _build_multi_turn_prompt, _anchor_alignment_score
+
+    generator = MultiModelGenerator(provider=provider, model=model)
+
+    problem_id = entry.get("trace_id") or entry.get("problem_id", "unknown")
+    file_path = entry.get("code_context", {}).get("file_path", "solution.py")
+    conversation_history = entry.get("conversation_history", [])[:max_turns]
+
+    if not conversation_history:
+        return {
+            "problem_id": problem_id, "mode": mode,
+            "provider": provider, "model": generator.model,
+            "solved": False, "first_success_turn": None,
+            "total_turns": 0, "total_attempts": 0,
+            "total_input_tokens": 0, "total_output_tokens": 0,
+            "turn_results": [], "subproblems": [],
+            "file_path": file_path,
+            "error": "No conversation history in multi-turn entry",
+        }
+
+    dialogue_chain: List[Dict[str, Any]] = []
+    accumulated_code = entry.get("code_context", {}).get("corrupted_code", "") or ""
+    turn_summaries: List[Dict[str, Any]] = []
+    subproblems_log: List[Dict[str, Any]] = []
+    total_attempts = 0
+    total_input_tokens = 0
+    total_output_tokens = 0
+    all_tests: List[str] = []
+    first_success_turn: Optional[int] = None
+
+    for turn_idx, turn_data in enumerate(conversation_history):
+        turn_id = turn_data.get("turn_id", turn_idx)
+        context = turn_data.get("context", "") or ""
+        expected_target = turn_data.get("target_code", "") or ""
+        has_injected_error = turn_data.get("has_error", False)
+        subproblems_funcs = turn_data.get("subproblems", []) or []
+        test_cases = turn_data.get("test_cases", []) or []
+
+        if test_cases:
+            all_tests.extend(test_cases)
+
+        turn_result: Dict[str, Any] = {
+            "turn_id": turn_id,
+            "subproblems": subproblems_funcs,
+            "has_injected_error": has_injected_error,
+            "solved": False,
+            "attempts": [],
+        }
+
+        turn_input_tokens = 0
+        turn_output_tokens = 0
+        turn_attempt_count = 0
+        turn_solved = False
+        last_trace = ""
+
+        task_desc = f"Implement the following functions: {', '.join(subproblems_funcs)}"
+        if context:
+            task_desc += f"\n\nYou can use the previously implemented code:\n```python\n{context}\n```"
+
+        current_code = expected_target
+        context_seed = accumulated_code if accumulated_code else context
+        full_code = context_seed + "\n\n" + current_code if context_seed else current_code
+
+        success, output, trace, anchor_hits = _run_tracebench_tests(
+            full_code, f"turn_{turn_id}.py", test_cases, entry
+        )
+
+        if success:
+            turn_solved = True
+            turn_result["solved"] = True
+            accumulated_code = full_code
+            dialogue_chain.append({
+                "turn": turn_id, "role": "user",
+                "content": task_desc + "\n\nImplement these functions to pass the tests.",
+            })
+            dialogue_chain.append({
+                "turn": turn_id, "role": "assistant",
+                "content": f"```python\n{current_code}\n```",
+            })
+        else:
+            last_trace = trace or output
+            anchor_hits = anchor_hits or []
+            seed_anchors = _get_anchor_lines(entry) if mode == "error_aware" else []
+
+            for attempt_idx in range(max_attempts_per_turn):
+                total_attempts += 1
+                turn_attempt_count += 1
+
+                prompt = _build_multi_turn_prompt(
+                    entry=entry,
+                    turn_id=turn_id,
+                    task_desc=task_desc,
+                    current_code=full_code,
+                    tests=test_cases,
+                    last_failure=last_trace,
+                    dialogue_history=dialogue_chain,
+                    mode=mode,
+                    anchor_hits=sorted(set(seed_anchors + anchor_hits)),
+                )
+
+                candidate_code = ""
+                candidate_spans: List[Dict[str, Any]] = []
+                raw_resp = ""
+                call_in = 0
+                call_out = 0
+
+                if mode == "error_aware":
+                    num_samples = 3
+                    best_score = -1.0
+                    for _ in range(num_samples):
+                        sample_temp = min(0.8, temperature + 0.1)
+                        resp = generator.generate(prompt, temperature=sample_temp)
+                        s_in = int(generator.last_usage.get("input_tokens", 0) or 0)
+                        s_out = int(generator.last_usage.get("output_tokens", 0) or 0)
+                        total_input_tokens += s_in
+                        total_output_tokens += s_out
+                        turn_input_tokens += s_in
+                        turn_output_tokens += s_out
+                        call_in = s_in  # remember last for attempt_log
+                        call_out = s_out
+                        code = extract_code(resp or "") if resp else ""
+                        if not code:
+                            continue
+                        spans = _compute_patch_spans(full_code, code, f"turn_{turn_id}.py")
+                        score = _anchor_alignment_score(spans, anchor_hits)
+                        if score > best_score:
+                            best_score = score
+                            candidate_code = code
+                            candidate_spans = spans
+                            raw_resp = resp
+                    if not candidate_code:
+                        raw_resp = generator.generate(prompt, temperature=temperature)
+                        call_in = int(generator.last_usage.get("input_tokens", 0) or 0)
+                        call_out = int(generator.last_usage.get("output_tokens", 0) or 0)
+                        total_input_tokens += call_in
+                        total_output_tokens += call_out
+                        turn_input_tokens += call_in
+                        turn_output_tokens += call_out
+                        candidate_code = extract_code(raw_resp or "") if raw_resp else ""
+                        candidate_spans = (
+                            _compute_patch_spans(full_code, candidate_code, f"turn_{turn_id}.py")
+                            if candidate_code else []
+                        )
+                else:
+                    raw_resp = generator.generate(prompt, temperature=temperature)
+                    call_in = int(generator.last_usage.get("input_tokens", 0) or 0)
+                    call_out = int(generator.last_usage.get("output_tokens", 0) or 0)
+                    total_input_tokens += call_in
+                    total_output_tokens += call_out
+                    turn_input_tokens += call_in
+                    turn_output_tokens += call_out
+                    candidate_code = extract_code(raw_resp or "") if raw_resp else ""
+                    candidate_spans = (
+                        _compute_patch_spans(full_code, candidate_code, f"turn_{turn_id}.py")
+                        if candidate_code else []
+                    )
+
+                edited_lines: List[int] = []
+                if candidate_code:
+                    try:
+                        b_lines = full_code.splitlines()
+                        a_lines = candidate_code.splitlines()
+                        m = difflib.SequenceMatcher(a=b_lines, b=a_lines)
+                        for tag, i1, i2, j1, j2 in m.get_opcodes():
+                            if tag == "equal":
+                                continue
+                            if tag in ("replace", "insert"):
+                                edited_lines.extend(range(j1 + 1, j2 + 1))
+                            else:
+                                edited_lines.append(max(1, j1 + 1))
+                        edited_lines = sorted(set(edited_lines))
+                    except Exception:
+                        pass
+
+                attempt_log: Dict[str, Any] = {
+                    "attempt_number": total_attempts,
+                    "turn": turn_id,
+                    "attempt_in_turn": attempt_idx,
+                    "mode": mode,
+                    "provider": provider,
+                    "model": generator.model,
+                    "temperature": temperature,
+                    "input_tokens": call_in,
+                    "output_tokens": call_out,
+                    "blame_spans": candidate_spans,
+                    "raw_response": raw_resp,
+                    "code_before": full_code,
+                    "edited_lines": edited_lines,
+                }
+
+                if not candidate_code:
+                    attempt_log["success"] = False
+                    attempt_log["test_result"] = "LLM returned empty response"
+                    turn_result["attempts"].append(attempt_log)
+                    last_trace = "LLM returned empty response"
+                    continue
+
+                success, output, trace, anchor_hits = _run_tracebench_tests(
+                    candidate_code, f"turn_{turn_id}.py", test_cases, entry
+                )
+
+                per_test_results: Dict[int, bool] = {}
+                try:
+                    from src.core.test_runner import run_tests_per_test as _rt
+                    _r = _rt(candidate_code, test_cases or [], file_path=f"turn_{turn_id}.py")
+                    if not _r.error:
+                        per_test_results = dict(_r.per_test)
+                except Exception:
+                    pass
+
+                attempt_log.update({
+                    "success": success,
+                    "test_result": output,
+                    "generated_code": candidate_code,
+                    "patch_spans": candidate_spans,
+                    "per_test_results": per_test_results,
+                })
+                turn_result["attempts"].append(attempt_log)
+
+                if success:
+                    turn_solved = True
+                    turn_result["solved"] = True
+                    accumulated_code = candidate_code
+                    dialogue_chain.append({
+                        "turn": turn_id, "role": "user",
+                        "content": task_desc + f"\n\nTests failed with:\n{last_trace}\n\nPlease fix the code.",
+                    })
+                    dialogue_chain.append({
+                        "turn": turn_id, "role": "assistant",
+                        "content": f"```python\n{candidate_code}\n```",
+                    })
+                    break
+
+                last_trace = trace or output
+                anchor_hits = anchor_hits or []
+                full_code = candidate_code
+
+        if not turn_solved:
+            dialogue_chain.append({
+                "turn": turn_id, "role": "user",
+                "content": task_desc + f"\n\nTests failed with:\n{last_trace}",
+            })
+            if full_code:
+                accumulated_code = full_code
+
+        subproblems_log.append(turn_result)
+        turn_summaries.append({
+            "turn": turn_id,
+            "attempts": turn_attempt_count,
+            "solved": turn_solved,
+            "input_tokens": turn_input_tokens,
+            "output_tokens": turn_output_tokens,
+        })
+
+        if turn_solved and first_success_turn is None:
+            first_success_turn = turn_id
+
+    overall_solved = all(t.get("solved", False) for t in subproblems_log)
+    if overall_solved and all_tests:
+        final_code = accumulated_code or (
+            (conversation_history[-1].get("context", "") or "") + "\n\n" +
+            (conversation_history[-1].get("target_code", "") or "")
+        )
+        final_ok, _, _, _ = _run_tracebench_tests(final_code, file_path, all_tests, entry)
+        if not final_ok:
+            overall_solved = False
+
+    return {
+        "problem_id": problem_id,
+        "mode": mode,
+        "provider": provider,
+        "model": generator.model,
+        "solved": overall_solved,
+        "first_success_turn": first_success_turn,
+        "total_turns": len(conversation_history),
+        "total_attempts": total_attempts,
+        "total_input_tokens": total_input_tokens,
+        "total_output_tokens": total_output_tokens,
+        "turn_results": turn_summaries,
+        "subproblems": subproblems_log,
+        "dialogue_chain_length": len(dialogue_chain),
+        "file_path": file_path,
+    }
+
+
 if __name__ == "__main__":
     import json
 

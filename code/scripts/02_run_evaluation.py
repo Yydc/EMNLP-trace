@@ -80,13 +80,15 @@ def main() -> None:
         print(f"resumed: {len(done)} problems already in checkpoint")
 
     # ---- Runner dispatch ----
-    # We use multi_model_runner.run_debug_session — it has the only complete
-    # multi-provider path (qwen/openai/claude/google/local). The older
-    # tracebench_runner.run_debug_session only handles Together + Anthropic.
+    # We use multi_model_runner.run_multi_turn_debug_session — every entry in
+    # tracebench_full.json has multi_turn=True with tests at
+    # conversation_history[i].test_cases, NOT at evaluation.test_cases. The
+    # single-turn run_debug_session reads the latter and short-circuits with
+    # vacuous-success; the multi-turn variant walks the conversation chain.
     print(f"launching runner for {args.model} (access={model_cfg['access']})")
     try:
         import multi_model_runner as mmr
-        runner = mmr.run_debug_session
+        runner = mmr.run_multi_turn_debug_session
     except Exception as e:
         sys.exit(f"failed to import multi_model_runner: {e}")
 
@@ -153,6 +155,7 @@ def main() -> None:
                     provider=provider_arg,
                     model=model_arg,
                     temperature=float(model_cfg.get("temperature", 0.2)),
+                    max_attempts_per_turn=int(model_cfg.get("max_attempts_per_turn", 3)),
                 )
             except Exception as e:
                 print(f"  [{i}] {pid}: runner crashed: {e}", file=sys.stderr)
