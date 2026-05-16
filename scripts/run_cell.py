@@ -76,6 +76,11 @@ def _start_vllm(model_cfg: dict) -> subprocess.Popen:
         "--gpu-memory-utilization", str(gpu_util),
         "--max-model-len", str(max_len),
         "--enable-prefix-caching",
+        # Triton GDN prefill backend skips the slow flashinfer JIT kernel
+        # compile (was 3-6h on Qwen3.x cold start; vllm/vllm#41865). No
+        # measurable perf difference per upstream. Safe no-op for non-GDN
+        # models (vllm only applies for hybrid-attention architectures).
+        "--gdn-prefill-backend", "triton",
     ]
     log_path = REPO_ROOT / "out" / "vllm_logs" / f"{model_cfg['id']}.log"
     log_path.parent.mkdir(parents=True, exist_ok=True)
@@ -145,6 +150,10 @@ def main() -> int:
     ap.add_argument("--limit", type=int, default=None)
     ap.add_argument("--max-usd", type=float, default=None)
     ap.add_argument("--max-wall-clock-hours", type=float, default=None)
+    ap.add_argument("--concurrency", type=int, default=1,
+                    help="Forward to 02_run_evaluation.py --concurrency. "
+                         "Recommended: 8 for local vLLM (prefix-cache shares "
+                         "KV across in-flight workers), 4-8 for API.")
     args = ap.parse_args()
 
     pipeline_entry, model_cfg = _load_model_cfg(args.model_id)
@@ -154,6 +163,7 @@ def main() -> int:
     if args.limit is not None:                 extra += ["--limit", str(args.limit)]
     if args.max_usd is not None:               extra += ["--max-usd", str(args.max_usd)]
     if args.max_wall_clock_hours is not None:  extra += ["--max-wall-clock-hours", str(args.max_wall_clock_hours)]
+    if args.concurrency > 1:                   extra += ["--concurrency", str(args.concurrency)]
 
     vllm_proc: subprocess.Popen | None = None
     rc = 1
