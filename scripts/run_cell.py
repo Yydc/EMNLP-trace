@@ -75,6 +75,7 @@ def _start_vllm(model_cfg: dict) -> subprocess.Popen:
         "--port", str(port),
         "--gpu-memory-utilization", str(gpu_util),
         "--max-model-len", str(max_len),
+        "--enable-prefix-caching",
     ]
     log_path = REPO_ROOT / "out" / "vllm_logs" / f"{model_cfg['id']}.log"
     log_path.parent.mkdir(parents=True, exist_ok=True)

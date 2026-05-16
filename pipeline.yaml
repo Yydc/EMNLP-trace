@@ -66,6 +66,11 @@ models:
     access: api
     estimated_h100_hours: 0
     estimated_api_usd: 97.4        # Gemini-3.1-Pro Standard @ 8K/2K tokens × 2402 calls
+  - id: gpt_54
+    config: code/configs/models/gpt_54.yaml
+    access: api
+    estimated_h100_hours: 0
+    estimated_api_usd: 460         # GPT-5.4 Standard @ 12k/6k tokens × 5 attempt × 818
 
 # ---------------------------------------------------------------------
 # Split registry

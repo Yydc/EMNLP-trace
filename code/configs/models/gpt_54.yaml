@@ -1,0 +1,46 @@
+# GPT-5.4 — closed frontier (OpenAI)
+id: gpt_54
+display_name: GPT-5.4
+family: closed_frontier
+access: api
+backend: openai
+api_env_var: OPENAI_API_KEY
+api_model_id: gpt-5.4              # adjust to actual OpenAI model id at runtime
+
+# Decoding — note: gpt-5* enforces temperature=1.0; MultiModelGenerator
+# detects the gpt-5/o1/o3/o4 prefix and skips temperature kwarg.
+temperature: 0.2
+max_output_tokens: 8192            # maps to max_completion_tokens for reasoning models
+seed: 12345
+
+# Multi-turn protocol
+t_max: 5
+prompt_template: full_transcript
+require_blame_json: true
+
+# Pricing assumptions (Standard tier, 2026 schedule)
+pricing:
+  input_usd_per_million: 2.5
+  output_usd_per_million: 15.0
+  batch_input_usd_per_million: 1.25
+  batch_output_usd_per_million: 7.5
+
+# Rate-limit config — Tier 1 is conservative (~500 RPM)
+rate_limit:
+  rpm: 500
+  tpm: 800000
+  retry_max_attempts: 5
+  retry_backoff_seconds: [2, 5, 15, 60, 180]
+  concurrency: 4
+
+# Cost estimate (mean 12k in / 6k out × 5 attempts × 818 problems)
+estimated_h100_hours_full: 0
+estimated_api_usd_full: 460
+
+notes: |
+  - reasoning_tokens are billed as output_tokens (already in completion_tokens
+    per OpenAI spec, but MultiModelGenerator defensively reads completion_tokens_details).
+  - System prompt + _build_multi_turn_prompt's "Output only Python code, no
+    chain of thought" instruction is shared with all 6 models; should suppress
+    reasoning-block output growth.
+  - Concurrency=4 is safe at Tier 1; if Tier 2+ key, can push to 8.

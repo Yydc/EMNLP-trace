@@ -169,36 +169,58 @@ class MultiModelGenerator:
             return ""
 
     def _generate_openai(self, prompt: str, temperature: float, max_tokens: int) -> str:
-        """使用 OpenAI API"""
+        """OpenAI Chat Completions; supports classic + reasoning families.
+
+        Handles GPT-5.x / o1 / o3 quirks:
+          * `max_tokens` was renamed to `max_completion_tokens`.
+          * temperature is hard-locked to 1.0 — passing anything else 400s.
+          * usage carries `reasoning_tokens` we should bill as output (user pays).
+          * response.choices[0].message.content may be None when the model only
+            emitted reasoning text (then we read `reasoning_content`).
+        """
         try:
             from openai import OpenAI
         except ImportError:
             raise RuntimeError("openai package required. Install: pip install openai")
 
         client = OpenAI(api_key=self.api_key)
-        # Optional seed for reproducibility (paper bootstrap CI uses this).
         seed_env = os.getenv("TRACEBENCH_SEED")
-        kwargs = {}
-        if seed_env:
-            try:
-                kwargs["seed"] = int(seed_env)
-            except ValueError:
-                pass
+        is_reasoning = any(self.model.lower().startswith(p) for p in ("gpt-5", "o1", "o3", "o4"))
+
+        kwargs = {"model": self.model,
+                  "messages": [{"role": "user", "content": prompt}]}
+        if is_reasoning:
+            kwargs["max_completion_tokens"] = max_tokens
+            # temperature must be 1.0 for reasoning models
+        else:
+            kwargs["max_tokens"] = max_tokens
+            kwargs["temperature"] = temperature
+            if seed_env:
+                try:
+                    kwargs["seed"] = int(seed_env)
+                except ValueError:
+                    pass
 
         try:
-            response = client.chat.completions.create(
-                model=self.model,
-                messages=[{"role": "user", "content": prompt}],
-                temperature=temperature,
-                max_tokens=max_tokens,
-                **kwargs,
-            )
+            response = client.chat.completions.create(**kwargs)
             usage = getattr(response, "usage", None)
-            self.last_usage = {
-                "input_tokens":  getattr(usage, "prompt_tokens", 0) or 0,
-                "output_tokens": getattr(usage, "completion_tokens", 0) or 0,
-            }
-            return response.choices[0].message.content or ""
+            in_tok  = getattr(usage, "prompt_tokens", 0) or 0
+            out_tok = getattr(usage, "completion_tokens", 0) or 0
+            # Reasoning models bill reasoning_tokens separately; bake into output
+            details = getattr(usage, "completion_tokens_details", None)
+            if details is not None:
+                reasoning = getattr(details, "reasoning_tokens", 0) or 0
+                # completion_tokens already includes reasoning per OpenAI spec,
+                # but defensively cap to max(out_tok, reasoning)
+                out_tok = max(out_tok, reasoning)
+            self.last_usage = {"input_tokens": in_tok, "output_tokens": out_tok}
+
+            msg = response.choices[0].message
+            text = getattr(msg, "content", None)
+            if not text:
+                # Reasoning-only response — try reasoning_content
+                text = getattr(msg, "reasoning_content", None)
+            return text or ""
         except Exception as e:
             print(f"Error calling OpenAI API: {e}", file=sys.stderr)
             self.last_usage = {"input_tokens": 0, "output_tokens": 0}

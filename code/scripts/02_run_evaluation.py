@@ -39,6 +39,10 @@ def main() -> None:
     ap.add_argument("--max-usd", type=float, default=None,
                     help="Hard API spend cap for THIS cell. If exceeded, "
                          "checkpoint is saved and the script exits non-zero.")
+    ap.add_argument("--concurrency", type=int, default=1,
+                    help="Number of problems to run in parallel (ThreadPool). "
+                         "Recommended: 8 for local vLLM with prefix-cache, "
+                         "4-8 for Gemini, 2-4 for OpenAI GPT-5.4 (Tier RPM).")
     ap.add_argument("--max-wall-clock-hours", type=float, default=None,
                     help="Hard wall-clock cap for THIS cell (hours).")
     args = ap.parse_args()
@@ -103,7 +107,11 @@ def main() -> None:
             sys.exit(f"{model_cfg['api_env_var']} not set in env")
         provider_arg = "google"
         model_arg    = model_cfg["api_model_id"]
-        # GOOGLE_API_KEY is already in env from the caller.
+    elif model_cfg["access"] == "api" and model_cfg["backend"] == "openai":
+        if not os.getenv(model_cfg["api_env_var"]):
+            sys.exit(f"{model_cfg['api_env_var']} not set in env")
+        provider_arg = "openai"
+        model_arg    = model_cfg["api_model_id"]
     elif model_cfg["access"] == "local":
         # Caller is responsible for `vllm serve <repo>` on $vllm_port.
         port = model_cfg.get("vllm_port", 8000)
@@ -131,71 +139,110 @@ def main() -> None:
         print(f"BudgetGuard: max_usd={args.max_usd}, "
               f"max_wall_clock_h={args.max_wall_clock_hours}")
 
-    # ---- Run loop ----
-    n_done = len(done)
+    # ---- Run loop (ThreadPoolExecutor when --concurrency > 1) ----
+    # Threading model:
+    #   * Each problem is processed by one worker (runs the whole multi-turn
+    #     loop in run_multi_turn_debug_session — itself serial within a problem).
+    #   * vLLM / OpenAI / Google SDK clients are thread-safe; the underlying
+    #     server handles concurrent requests.
+    #   * Shared mutable state (BudgetGuard, file handles, n_done counter) is
+    #     guarded with locks. Cancellation on BUDGET CUT: stop *submitting* new
+    #     workers; in-flight ones drain (their records are not wasted).
+    import threading
+    from concurrent.futures import ThreadPoolExecutor, as_completed
+
+    write_lock = threading.Lock()
+    guard_lock = threading.Lock()
+    counter_lock = threading.Lock()
+    stop_event = threading.Event()
+
+    state = {"n_done": len(done), "aborted": False}
     t0 = time.time()
-    aborted = False
-    with rec_path.open("a") as rec_fh, ckpt_path.open("a") as ckpt_fh:
-        for i, entry in enumerate(data, 1):
-            pid = entry.get("problem_id")
-            if pid in done:
-                continue
 
-            # Budget check BEFORE each problem
+    def _process_one(entry):
+        pid = entry.get("problem_id")
+        if stop_event.is_set():
+            return
+        with guard_lock:
             if guard.should_stop():
-                print(f"\n!! BUDGET CUT: {guard.reason()}", file=sys.stderr)
-                aborted = True
-                break
+                if not stop_event.is_set():
+                    print(f"\n!! BUDGET CUT: {guard.reason()}", file=sys.stderr)
+                stop_event.set()
+                state["aborted"] = True
+                return
+        try:
+            problem_log = runner(
+                entry,
+                mode="baseline",
+                max_turns=model_cfg.get("t_max", 5),
+                provider=provider_arg,
+                model=model_arg,
+                temperature=float(model_cfg.get("temperature", 0.2)),
+                max_attempts_per_turn=int(model_cfg.get("max_attempts_per_turn", 3)),
+            )
+        except Exception as e:
+            print(f"  {pid}: runner crashed: {e}", file=sys.stderr)
+            return
 
-            try:
-                problem_log = runner(
-                    entry,
-                    mode="baseline",
-                    max_turns=model_cfg.get("t_max", 5),
-                    provider=provider_arg,
-                    model=model_arg,
-                    temperature=float(model_cfg.get("temperature", 0.2)),
-                    max_attempts_per_turn=int(model_cfg.get("max_attempts_per_turn", 3)),
-                )
-            except Exception as e:
-                print(f"  [{i}] {pid}: runner crashed: {e}", file=sys.stderr)
-                continue
-
-            # Charge tokens to guard (best-effort: read from problem_log if runner reports)
-            in_tok  = problem_log.get("total_input_tokens", 0)
-            out_tok = problem_log.get("total_output_tokens", 0)
+        in_tok  = problem_log.get("total_input_tokens", 0)
+        out_tok = problem_log.get("total_output_tokens", 0)
+        with guard_lock:
             if model_cfg.get("access") == "api":
                 guard.add_cost(in_tok, out_tok, pin, pout)
             else:
                 guard.add_call_no_cost()
 
-            # Per-problem record. `subproblems` contains the per-attempt detail
-            # (blame_spans, generated_code, code_before, edited_lines, patch_spans,
-            # per_test_results, raw_response) that TraceabilityMetrics.analyze /
-            # metrics_v2 need to compute Outside-G, RegressionRate, Blame@K, slope.
-            # Without this, downstream analyze can only compute pass1/avg_turns.
-            record = {
-                "problem_id": pid,
-                "trace_id": entry.get("trace_id"),
-                "model": args.model,
-                "split": args.split,
-                "solved": bool(problem_log.get("solved")),
-                "total_turns": problem_log.get("total_turns"),
-                "total_attempts": problem_log.get("total_attempts"),
-                "turn_results": problem_log.get("turn_results"),
-                "subproblems":  problem_log.get("subproblems"),
-                "total_input_tokens": in_tok,
-                "total_output_tokens": out_tok,
-            }
+        record = {
+            "problem_id": pid,
+            "trace_id": entry.get("trace_id"),
+            "model": args.model,
+            "split": args.split,
+            "solved": bool(problem_log.get("solved")),
+            "total_turns": problem_log.get("total_turns"),
+            "total_attempts": problem_log.get("total_attempts"),
+            "turn_results": problem_log.get("turn_results"),
+            "subproblems":  problem_log.get("subproblems"),
+            "total_input_tokens": in_tok,
+            "total_output_tokens": out_tok,
+        }
+        with write_lock:
             rec_fh.write(json.dumps(record, ensure_ascii=False) + "\n"); rec_fh.flush()
             ckpt_fh.write(json.dumps({"problem_id": pid, "solved": record["solved"]})
                           + "\n"); ckpt_fh.flush()
-            n_done += 1
-            if n_done % 25 == 0:
-                rate = n_done / max(time.time() - t0, 1e-9)
-                eta = (len(data) - n_done) / max(rate, 1e-9)
-                print(f"  [{n_done}/{len(data)}] rate={rate:.1f}/s  "
+        with counter_lock:
+            state["n_done"] += 1
+            n = state["n_done"]
+            if n % 25 == 0 or args.concurrency > 1 and n % 10 == 0:
+                rate = n / max(time.time() - t0, 1e-9)
+                eta = (len(data) - n) / max(rate, 1e-9)
+                print(f"  [{n}/{len(data)}] rate={rate:.2f}/s  "
                       f"eta={eta/60:.0f}m  {guard}")
+
+    todo = [e for e in data if e.get("problem_id") not in done]
+
+    with rec_path.open("a") as rec_fh, ckpt_path.open("a") as ckpt_fh:
+        if args.concurrency <= 1:
+            # Serial path (preserves old behavior for low-concurrency models / debugging)
+            for entry in todo:
+                if stop_event.is_set():
+                    break
+                _process_one(entry)
+        else:
+            with ThreadPoolExecutor(max_workers=args.concurrency) as ex:
+                futures = [ex.submit(_process_one, entry) for entry in todo]
+                for f in as_completed(futures):
+                    try:
+                        f.result()
+                    except Exception as e:
+                        print(f"  worker exception: {e}", file=sys.stderr)
+                    if stop_event.is_set():
+                        # Cancel pending (not-yet-started) futures; in-flight drain
+                        for pending in futures:
+                            if not pending.done() and not pending.running():
+                                pending.cancel()
+
+    n_done = state["n_done"]
+    aborted = state["aborted"]
 
     # Summary
     summary = {

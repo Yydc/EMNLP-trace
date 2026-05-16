@@ -62,6 +62,7 @@ def warmup_one(model_id: str) -> tuple[bool, float, str]:
         "--port", str(port),
         "--gpu-memory-utilization", str(gpu_util),
         "--max-model-len", str(max_len),
+        "--enable-prefix-caching",
     ]
     print(f"\n===== WARMUP {model_id} pid_about_to_spawn =====", flush=True)
     print(f"  cmd: {' '.join(cmd)}", flush=True)
