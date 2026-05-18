@@ -1,0 +1,63 @@
+{
+  "_meta": {
+    "generator": "code/scripts/03b_fixup_outside_g.py",
+    "method": "anchor_value string match in code_before snippet (snippet coords)",
+    "anchor_radius": 3
+  },
+  "per_model": {
+    "gemini_31_pro": {
+      "n_problems_with_outside_g": 686,
+      "mean_outside_g": 0.6585,
+      "p10": 0.2,
+      "p25": 0.444,
+      "p50": 0.729,
+      "p75": 0.964,
+      "p90": 1.0
+    },
+    "gemma_4_31b": {
+      "n_problems_with_outside_g": 680,
+      "mean_outside_g": 0.7562,
+      "p10": 0.5,
+      "p25": 0.667,
+      "p50": 0.808,
+      "p75": 0.919,
+      "p90": 0.982
+    },
+    "glm_47_flash": {
+      "n_problems_with_outside_g": 683,
+      "mean_outside_g": 0.8051,
+      "p10": 0.253,
+      "p25": 0.75,
+      "p50": 0.958,
+      "p75": 1.0,
+      "p90": 1.0
+    },
+    "gpt_54": {
+      "n_problems_with_outside_g": 685,
+      "mean_outside_g": 0.6999,
+      "p10": 0.375,
+      "p25": 0.6,
+      "p50": 0.75,
+      "p75": 0.866,
+      "p90": 0.96
+    },
+    "qwen3_6_27b": {
+      "n_problems_with_outside_g": 683,
+      "mean_outside_g": 0.7616,
+      "p10": 0.333,
+      "p25": 0.636,
+      "p50": 0.896,
+      "p75": 0.998,
+      "p90": 1.0
+    },
+    "qwen3_6_35b_a3b": {
+      "n_problems_with_outside_g": 682,
+      "mean_outside_g": 0.7574,
+      "p10": 0.312,
+      "p25": 0.602,
+      "p50": 0.895,
+      "p75": 0.988,
+      "p90": 1.0
+    }
+  }
+}

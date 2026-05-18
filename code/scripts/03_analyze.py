@@ -102,6 +102,16 @@ def compute_per_problem_metrics(
     that need per-attempt detail will be None.
     """
     from core.traceability_metrics import TraceabilityMetrics
+    from core import metrics_v2
+    # CF-Valid@1 + regression_rate both spawn subprocess.run per attempt-pair
+    # to re-test cf-patched / before-after code. That's ~3s × 4800 records ×
+    # multiple attempts = 6+ hours wall. Skip both for the main analyze pass:
+    #   - cf_valid_at_1: returns None, paper relies on Outside-G instead
+    #   - regression_rate: returns None here; computed post-hoc by a
+    #     separate fixup script using the saved `per_test_results` field
+    #     from each attempt (already in records, no subprocess needed)
+    TraceabilityMetrics._compute_cf_valid_at_1 = lambda self, *a, **kw: None
+    metrics_v2.regression_rate_trajectory = lambda *a, **kw: None
     tm = TraceabilityMetrics(k_values=[1, 3, 5])
 
     per_problem = defaultdict(list)

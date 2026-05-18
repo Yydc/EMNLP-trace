@@ -1,0 +1,19 @@
+{
+  "model": "gpt_54",
+  "split": "full",
+  "n_problems": 818,
+  "n_done": 785,
+  "aborted": false,
+  "wall_clock_s": 385.2,
+  "records_path": "/data2/yix/EMNLP-trace/out/records/gpt_54_full_records.jsonl",
+  "budget": {
+    "elapsed_seconds": 385.3,
+    "spent_usd": 19.3696,
+    "total_input_tokens": 3535958,
+    "total_output_tokens": 701983,
+    "total_calls": 785,
+    "max_wall_clock_seconds": 43200.0,
+    "max_usd": 100.0,
+    "stop_reason": null
+  }
+}

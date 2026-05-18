@@ -1,0 +1,8 @@
+model,n,r,p,ci_lo,ci_hi
+gemini_31_pro,0,,,,
+gemma_4_31b,0,,,,
+glm_47_flash,0,,,,
+gpt_54,0,,,,
+qwen3_6_27b,0,,,,
+qwen3_6_35b_a3b,0,,,,
+_pooled,0,,,,

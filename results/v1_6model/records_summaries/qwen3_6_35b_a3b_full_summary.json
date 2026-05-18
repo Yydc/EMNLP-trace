@@ -1,0 +1,19 @@
+{
+  "model": "qwen3_6_35b_a3b",
+  "split": "full",
+  "n_problems": 818,
+  "n_done": 783,
+  "aborted": false,
+  "wall_clock_s": 17869.5,
+  "records_path": "/data2/yix/EMNLP-trace/out/records/qwen3_6_35b_a3b_full_records.jsonl",
+  "budget": {
+    "elapsed_seconds": 17869.5,
+    "spent_usd": 0.0,
+    "total_input_tokens": 0,
+    "total_output_tokens": 0,
+    "total_calls": 783,
+    "max_wall_clock_seconds": 108000.0,
+    "max_usd": null,
+    "stop_reason": null
+  }
+}

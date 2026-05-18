@@ -1,0 +1,21 @@
+{
+  "_meta": {
+    "generated_by": "code/scripts/03_analyze.py",
+    "records_dir": "out/records",
+    "n_cells_processed": 6,
+    "hard_n": 128,
+    "full_n": 818,
+    "n_problems_with_metrics": 4703
+  },
+  "n_models": 6,
+  "n_full_problems": 818,
+  "n_hard_problems": 128,
+  "outside_g_r": null,
+  "outside_g_n": 0,
+  "outside_g_p": null,
+  "outside_g_ci_lo": null,
+  "outside_g_ci_hi": null,
+  "early_drift_cum_patch_delta": null,
+  "early_drift_outside_g_delta": null,
+  "early_drift_blame1_delta": null
+}
