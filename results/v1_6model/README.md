@@ -70,14 +70,73 @@ gpt_54           0.70
 gemini_31_pro    0.66  (most focused — yet not best pass1)
 ```
 
-## What's NOT in this drop (deferred)
+## Two flagship findings — REAL numbers (post-cascade fixups 03c + 03d)
+
+### Finding 1: Outside-G ↔ RegressionRate Pearson — **NOT supported by data**
+
+```
+Pooled  n=508  r=0.062  p=0.16  CI [-0.025, 0.149]
+```
+
+All per-model r are near zero with CIs crossing zero (range −0.09 to +0.26).
+The two metrics are essentially uncorrelated on this dataset.
+
+**Paper implication**: the "Outside-G validates RegressionRate r=0.62" claim
+must be reframed or dropped. Suggested reframing: "Outside-G measures a
+localization-quality dimension orthogonal to regression behavior — both are
+needed to characterize patch quality."
+
+See `tables/outside_g_regression.csv` (per model + pooled) and `analysis/numbers.json` (`outside_g_r/n/p/ci_lo/ci_hi`).
+
+### Finding 2: Early mis-localization → drift — **STRONGLY supported** ✓
+
+```
+Pooled  n_hit=189  n_miss=147
+  cum_patch_delta = +40.9 lines      CI [+14.9, +66.6]  ✓ strictly positive
+  outside_g_delta(last_turn) = +0.66 CI [+0.60, +0.70]  ✓ very tight
+```
+
+Per-model: every cell shows positive Δ outside_g with CIs entirely above zero.
+Models that mis-localize at turn 0 edit ~41 more lines cumulatively AND
+remain ~0.66 outside the fault region even at the last turn — they **don't
+recover** from initial mis-localization.
+
+Best per-model recovery: gpt_54 (Δ outside_g = 0.54).
+Worst: qwen3_6_27b (Δ = 0.87 — its "miss" trajectories never converge back).
+
+See `analysis/early_drift_summary.json` for per-model breakdown with
+bootstrap (200 iters, seed=20260518) 95% CIs on both deltas.
+
+## What's still deferred / dropped
 
 - **blame@k columns**: dropped from main_gap_table. Runner in baseline mode aliases `blame_spans` to `patch_spans` (no dedicated localization prompt). Paper should cite `patch_locality` (in per_problem_metrics.jsonl) as proxy + footnote that a follow-up cell with localization prompt would be needed for true blame@k.
-- **regression_rate column**: skipped in main_gap_table because the original implementation in `code/src/core/metrics_v2.regression_rate_for_pair` spawned subprocess.run per attempt pair → ~6h for the full table. A post-hoc fixup using saved `per_test_results` (no subprocess) is straightforward — 30 lines of Python on the records (run when paper authors need it).
-- **cf_valid_at_1**: also skipped for the same subprocess reason. Paper relies on Outside-G + pass1 + gap as headline metrics; cf_valid_at_1 is supplementary.
-- **outside_g_r (Pearson)**: requires regression_rate fixup first.
-- **early_drift (Miss-Hit deltas)**: not implemented end-to-end in analyze. Stub in numbers.json.
+- **cf_valid_at_1**: skipped (subprocess flood). Paper relies on Outside-G + pass1 + gap + early-drift as headline metrics; cf_valid_at_1 is supplementary.
+- **`out_g` column in main_gap_table.csv** is the OLD artifact value (~0.93 constant from `TraceabilityMetrics.active_spans_from_entry` in original-codebase coords). **Use `outside_g_fixup_summary.json` for the real distribution** (snippet-coord, anchor_value-matched).
 - **figures + tex + paper PDF**: skipped this round; rerunning `make figures && make tex && make paper` against this analyze output produces the paper-style outputs.
+
+## Reproducibility — full pipeline from records
+
+```bash
+# Stage 3 main analyze (skips subprocess-heavy metrics for speed)
+make analyze
+
+# Stage 3b Outside-G fixup (anchor_value snippet-coord)
+python code/scripts/03b_fixup_outside_g.py \
+    --records-dir out/records \
+    --output-dir results/v1_6model/analysis
+
+# Stage 3c RegressionRate fixup (uses saved per_test_results, no subprocess)
+python code/scripts/03c_fixup_regression_rate.py \
+    --records-dir out/records \
+    --output-dir results/v1_6model/analysis
+
+# Stage 3d Pearson + Early-drift Hit-vs-Miss (bootstrap CI)
+python code/scripts/03d_compute_correlations_and_drift.py \
+    --records-dir out/records \
+    --results-dir results/v1_6model
+```
+
+All four can re-run on the records dir read-only; no eval needed.
 
 ## Reproducibility
 

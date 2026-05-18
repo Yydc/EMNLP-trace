@@ -5,17 +5,22 @@
     "n_cells_processed": 6,
     "hard_n": 128,
     "full_n": 818,
-    "n_problems_with_metrics": 4703
+    "n_problems_with_metrics": 4703,
+    "updated_by": "03d_compute_correlations_and_drift.py"
   },
   "n_models": 6,
   "n_full_problems": 818,
   "n_hard_problems": 128,
-  "outside_g_r": null,
-  "outside_g_n": 0,
-  "outside_g_p": null,
-  "outside_g_ci_lo": null,
-  "outside_g_ci_hi": null,
-  "early_drift_cum_patch_delta": null,
-  "early_drift_outside_g_delta": null,
-  "early_drift_blame1_delta": null
+  "outside_g_r": 0.0623,
+  "outside_g_n": 508,
+  "outside_g_p": 0.161056,
+  "outside_g_ci_lo": -0.0248,
+  "outside_g_ci_hi": 0.1485,
+  "early_drift_cum_patch_delta": 40.884,
+  "early_drift_outside_g_delta": 0.6556,
+  "early_drift_blame1_delta": null,
+  "early_drift_cum_patch_ci_lo": 14.865,
+  "early_drift_cum_patch_ci_hi": 66.607,
+  "early_drift_outside_g_ci_lo": 0.6047,
+  "early_drift_outside_g_ci_hi": 0.6962
 }
